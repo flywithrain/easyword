@@ -1,0 +1,37 @@
+plugins {
+    id 'groovy'
+}
+
+group = 'com.thunisoft'
+version = '1.0.0'
+sourceCompatibility = '1.8'
+def poiVersion = '4.1.0'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url 'http://maven.aliyun.com/nexus/content/groups/public'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.codehaus.groovy:groovy:+'
+    compile "org.apache.poi:poi:${poiVersion}"
+    compile "org.apache.poi:poi-ooxml:${poiVersion}"
+    compile "org.apache.poi:poi-examples:${poiVersion}"
+    compile "org.apache.poi:poi-excelant:${poiVersion}"
+    compile "org.apache.poi:poi-ooxml-schemas:${poiVersion}"
+    compile "org.apache.poi:poi-scratchpad:${poiVersion}"
+    compile 'org.jetbrains:annotations:latest.release'
+}
+
+tasks.withType(GroovyCompile){
+    options.encoding = "UTF-8"
+}
