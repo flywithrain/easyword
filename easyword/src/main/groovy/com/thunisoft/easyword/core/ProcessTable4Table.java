@@ -2,6 +2,7 @@ package com.thunisoft.easyword.core;
 
 import com.thunisoft.easyword.bo.Customization;
 import org.apache.poi.xwpf.usermodel.*;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTrPr;
 
@@ -57,7 +58,7 @@ class ProcessTable4Table {
             List<List<Customization>> listList = entry.getValue();
             if (key.equals(text)) {
                 CTTrPr ctTrPr = row.getCtRow().getTrPr();
-                String style = getTrPr(ctTrPr);
+                String style = getTrPrString(ctTrPr);
                 List<XWPFTableCell> tableCells = row.getTableCells();
                 List<CTTcPr> ctTcPrList = new ArrayList<>();
                 for (XWPFTableCell temp : tableCells) {
@@ -66,15 +67,17 @@ class ProcessTable4Table {
                 int temp = rowIndex;
                 for (int j = 0; j < listList.size(); j++) {
                     List<Customization> list = listList.get(j);
+                    CTRPr ctrPr = run.getCTR().getRPr();
+                    Processor.processVanish(ctrPr);
                     XWPFTableRow newTableRow;
                     if (isHasNextRow(style, j)) {
                         newTableRow = table.getRow(rowIndex + 1);
                         for (int k = 0; k < list.size(); k++) {
                             Customization customization = list.get(k);
                             XWPFTableCell tableCell = newTableRow.getCell(k);
-                            XWPFParagraph xwpfParagraph = tableCell.getParagraphs().get(0);
+                            XWPFParagraph xwpfParagraph = getFirstTableParagraph(tableCell);
                             XWPFRun xwpfRun = xwpfParagraph.createRun();
-                            xwpfRun.getCTR().setRPr(run.getCTR().getRPr());
+                            xwpfRun.getCTR().setRPr(ctrPr);
                             xwpfRun.setText(customization.getText());
                         }
                         ++rowIndex;
@@ -84,10 +87,10 @@ class ProcessTable4Table {
                             Customization customization = list.get(k);
                             XWPFTableCell newTableCell = newTableRow.addNewTableCell();
                             newTableCell.getCTTc().setTcPr(ctTcPrList.get(k));
-                            XWPFParagraph newParagraph = newTableCell.getParagraphs().get(0);
+                            XWPFParagraph newParagraph = getFirstTableParagraph(newTableCell);
                             newParagraph.getCTP().setPPr(paragraph.getCTP().getPPr());
                             XWPFRun newRun = newParagraph.createRun();
-                            newRun.getCTR().setRPr(run.getCTR().getRPr());
+                            newRun.getCTR().setRPr(ctrPr);
                             newRun.setText(customization.getText());
                         }
                         newTableRow.getCtRow().setTrPr(ctTrPr);
@@ -103,13 +106,21 @@ class ProcessTable4Table {
         myResult = false;
     }
 
+    private static XWPFParagraph getFirstTableParagraph(XWPFTableCell tableCell){
+        List<XWPFParagraph> paragraphList = tableCell.getParagraphs();
+        if(paragraphList.isEmpty()){
+            return tableCell.addParagraph();
+        }
+        return paragraphList.get(0);
+    }
+
     private boolean isHasNextRow(String style, int j) {
         return table.getRow(rowIndex + 1) != null
-                && style.equals(getTrPr(table.getRow(rowIndex + 1).getCtRow().getTrPr()))
+                && style.equals(getTrPrString(table.getRow(rowIndex + 1).getCtRow().getTrPr()))
                 && j != 0;
     }
 
-    private static String getTrPr(CTTrPr ctTrPr){
+    private static String getTrPrString(CTTrPr ctTrPr){
         if(ctTrPr == null){
             return "";
         }

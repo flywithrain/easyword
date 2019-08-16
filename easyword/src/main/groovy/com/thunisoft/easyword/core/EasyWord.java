@@ -18,7 +18,11 @@ import java.util.Map;
  * @date 2019/8/13 9:34
  * @since 1.0.0
  */
-public class EasyWord {
+public final class EasyWord {
+
+    private EasyWord(){
+
+    }
 
     /**
      * description

@@ -1,9 +1,10 @@
 plugins {
     id 'groovy'
+    id 'maven-publish'
 }
 
 group = 'com.thunisoft'
-version = 'aplha 1.0.0'
+version = 'aplha'
 sourceCompatibility = '1.8'
 def poiVersion = '4.1.0'
 
@@ -35,4 +36,44 @@ dependencies {
 
 tasks.withType(GroovyCompile) {
     options.encoding = "UTF-8"
+}
+
+jar{
+
+}
+
+task sourceJar(type: Jar){
+    from sourceSets.main.allSource
+    classifier 'sources'
+}
+
+publishing{
+    publications{
+        maven(MavenPublication){
+            from components.java
+            artifact(sourceJar){
+                classifier "src"
+                extension "jar"
+            }
+            pom{
+                developers {
+                    developer {
+                        id = 'wxy'
+                        name = 'wangxiaoyu'
+                        email = '657518680@qq.com'
+                    }
+                }
+            }
+        }
+    }
+    repositories{
+        maven{
+            credentials{
+                username ''
+                password ''
+                url ''
+            }
+
+        }
+    }
 }

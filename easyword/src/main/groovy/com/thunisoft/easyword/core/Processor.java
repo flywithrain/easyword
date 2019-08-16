@@ -39,9 +39,9 @@ final class Processor {
                 XWPFRun newRun = paragraph.insertNewRun(rIndex);
                 CTRPr ctrPr = run.getCTR().getRPr();
                 processVanish(ctrPr);
-                newRun.getCTR().setRPr(run.getCTR().getRPr());
+                newRun.getCTR().setRPr(ctrPr);
                 paragraph.removeRun(rIndex + 1);
-                newRun.setText(text.replace(key, customization.getText()));
+                newRun.setText(text.replaceAll(key, customization.getText()));
             }
         }
     }
@@ -56,7 +56,9 @@ final class Processor {
             String key = entry.getKey();
             if (key.equals(text)) {
                 XWPFRun newRun = paragraph.insertNewRun(rIndex);
-                newRun.getCTR().setRPr(run.getCTR().getRPr());
+                CTRPr ctrPr = run.getCTR().getRPr();
+                processVanish(ctrPr);
+                newRun.getCTR().setRPr(ctrPr);
                 paragraph.removeRun(rIndex + 1);
                 newRun.addPicture(customization.getPicture(),
                         AnalyzeFileType.getFileType(customization.getPicture()),
@@ -91,7 +93,7 @@ final class Processor {
         }
     }
 
-    private static void processVanish(CTRPr ctrPr) {
+    static void processVanish(CTRPr ctrPr) {
         if (ctrPr != null) {
             CTOnOff vanish = ctrPr.getVanish();
             if (vanish != null && !vanish.isSetVal()) {
