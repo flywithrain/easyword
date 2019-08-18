@@ -1,6 +1,8 @@
 package com.thunisoft.easyword.core;
 
 import com.thunisoft.easyword.bo.Customization;
+import com.thunisoft.easyword.bo.Index;
+import com.thunisoft.easyword.bo.WordConstruct;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +22,7 @@ import java.util.Map;
  */
 public final class EasyWord {
 
-    private EasyWord(){
+    private EasyWord() {
 
     }
 
@@ -75,16 +77,22 @@ public final class EasyWord {
             List<XWPFRun> runs = paragraph.getRuns();
             for (int r = 0; r < runs.size(); ++r) {
                 XWPFRun run = runs.get(r);
-                String text = run.text();
-                Processor.processStaticLabel(staticLabel, paragraph, r, run, text);
-                ProcessDynamicLabel4Paragraph processDynamicLabel4Paragraph
-                        = new ProcessDynamicLabel4Paragraph(xwpfDocument, dynamicLabel, p, paragraph, run, text);
-                processDynamicLabel4Paragraph.process();
-                p = processDynamicLabel4Paragraph.getpIndex();
-                if (processDynamicLabel4Paragraph.isContinue()) {
+                Index index = new Index(p, r);
+                WordConstruct wordConstruct = new WordConstruct(paragraph, run);
+                //是否已经处理过run
+                boolean flag = Processor.processStaticLabel(staticLabel, wordConstruct, index);
+                if (!flag) {
+                    flag = Processor.processPicture4Paragraph(pictureLabel, wordConstruct, index);
+                }
+                boolean result = false;
+                if (!flag) {
+                    result = Processor.processDynamicLabel4Paragraph(xwpfDocument, dynamicLabel, wordConstruct, index);
+                }
+                p = index.getpIndex();
+                r = index.getrIndex();
+                if (result) {
                     continue pLable;
                 }
-                Processor.processPicture4Paragraph(pictureLabel, paragraph, r, run, text);
             }
         }
     }
@@ -106,35 +114,44 @@ public final class EasyWord {
                                      Map<String, Customization> pictureLabel)
             throws IOException, InvalidFormatException {
         List<XWPFTable> tables = xwpfDocument.getTables();
-        for (XWPFTable table : tables) {
+        for (int t = 0; t < tables.size(); ++t) {
+            XWPFTable table = tables.get(t);
             List<XWPFTableRow> rows = table.getRows();
             rlabel:
             for (int r = 0; r < rows.size(); ++r) {
                 XWPFTableRow row = rows.get(r);
                 List<XWPFTableCell> cells = row.getTableCells();
-                for (XWPFTableCell cell : cells) {
+                for (int c = 0; c < cells.size(); ++c) {
+                    XWPFTableCell cell = cells.get(c);
                     List<XWPFParagraph> paragraphs = cell.getParagraphs();
                     for (int p = 0; p < paragraphs.size(); ++p) {
                         XWPFParagraph paragraph = paragraphs.get(p);
                         List<XWPFRun> runs = paragraph.getRuns();
                         for (int i = 0; i < runs.size(); ++i) {
                             XWPFRun run = runs.get(i);
-                            String text = run.text();
-                            Processor.processStaticLabel(staticLabel, paragraph, i, run, text);
-                            ProcessTable4Table processTable4Table =
-                                    new ProcessTable4Table(tableLabel, table, r, row, paragraph, run, text);
-                            processTable4Table.process();
-                            r = processTable4Table.getRowIndex();
-                            if (processTable4Table.isContinue()) {
+                            Index index = new Index(t, r, c, p, i);
+                            WordConstruct wordConstruct = new WordConstruct(table, row, cell, paragraph, run);
+                            boolean flag = Processor.processStaticLabel(staticLabel, wordConstruct, index);
+                            if(!flag){
+                                flag = Processor.processPicture4Table(pictureLabel, wordConstruct, index);
+                            }
+                            boolean result = false;
+                            if(!flag){
+                                result = Processor.processTable4Table(tableLabel, wordConstruct, index);
+                            }
+                            t = index.getTableIndex();
+                            r = index.getRowIndex();
+                            c = index.getcIndex();
+                            p = index.getpIndex();
+                            i = index.getrIndex();
+                            if (result) {
                                 continue rlabel;
                             }
-                            Processor.processPicture4Table(pictureLabel, cell, text);
                         }
                     }
                 }
             }
         }
     }
-
 
 }

@@ -13,16 +13,7 @@ import java.io.InputStream;
  */
 public interface Customization {
 
-    default void handleParagraph(XWPFParagraph paragraph
-            , XWPFRun run) {
-        // do nothing if need can override
-    }
-
-    default void handleTable(XWPFTable table
-            , XWPFTableRow row
-            , XWPFTableCell cell
-            , XWPFParagraph paragraph
-            , XWPFRun run) {
+    default void handle(WordConstruct wordConstruct, Index index) {
         // do nothing if need can override
     }
 
