@@ -3,10 +3,10 @@ package com.thunisoft.easyword.constant;
 import org.apache.poi.xwpf.usermodel.Document;
 
 /**
+ * 2019/8/13 15:03
  * FileType
  *
  * @author 657518680@qq.com
- * @date 2019/8/13 15:03
  * @since 1.0.0
  */
 public enum FileTypeEnum {

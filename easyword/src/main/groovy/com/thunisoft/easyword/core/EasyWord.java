@@ -10,14 +10,15 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * 2019/8/13 9:34
  * EasyWord
  *
  * @author 657518680@qq.com
- * @date 2019/8/13 9:34
  * @since 1.0.0
  */
 public final class EasyWord {
@@ -27,16 +28,40 @@ public final class EasyWord {
     }
 
     /**
+     * 2019/8/19
      * description
      *
-     * @param inputStream  输入流
-     * @param outputStream 输出流
-     * @param staticLabel  静态标签
-     * @param dynamicLabel 动态标签
-     * @param tableLabel   列表标签
-     * @param pictureLabel 图片标签
+     * @param inputStream  inputStream
+     * @param outputStream outputStream
+     * @param staticLabel  staticLabel
+     * @throws IOException            IOException
+     * @throws InvalidFormatException InvalidFormatException
      * @author 657518680@qq.com
-     * @date 2019/8/13
+     * @since 1.0.0
+     */
+    public static void replaceLabel(@NotNull InputStream inputStream,
+                                    @NotNull OutputStream outputStream,
+                                    @NotNull Map<String, Customization> staticLabel)
+            throws IOException, InvalidFormatException {
+        replaceLabel(inputStream, outputStream, staticLabel,
+                new HashMap<>(0),
+                new HashMap<>(0),
+                new HashMap<>(0));
+    }
+
+    /**
+     * 2019/8/13
+     * description
+     *
+     * @param inputStream  inputStream
+     * @param outputStream outputStream
+     * @param staticLabel  staticLabel
+     * @param dynamicLabel dynamicLabel
+     * @param tableLabel   tableLabel
+     * @param pictureLabel pictureLabel
+     * @throws IOException            IOException
+     * @throws InvalidFormatException InvalidFormatException
+     * @author 657518680@qq.com
      * @since 1.0.0
      */
     public static void replaceLabel(@NotNull InputStream inputStream,
@@ -55,14 +80,14 @@ public final class EasyWord {
     }
 
     /**
+     * 2019/8/13
      * description
      *
-     * @param xwpfDocument 文档
-     * @param staticLabel  静态标签
-     * @param dynamicLabel 动态标签
-     * @param pictureLabel 图片标签
+     * @param xwpfDocument xwpfDocument
+     * @param staticLabel  staticLabel
+     * @param dynamicLabel dynamicLabel
+     * @param pictureLabel pictureLabel
      * @author 657518680@qq.com
-     * @date 2019/8/13
      * @since 1.0.0
      */
     private static void processParagraph(@NotNull XWPFDocument xwpfDocument,
@@ -98,14 +123,14 @@ public final class EasyWord {
     }
 
     /**
+     * 2019/8/13
      * description
      *
-     * @param xwpfDocument 文档
-     * @param staticLabel  静态标签
-     * @param tableLabel   列表标签
-     * @param pictureLabel 图片标签
+     * @param xwpfDocument xwpfDocument
+     * @param staticLabel  staticLabel
+     * @param tableLabel   tableLabel
+     * @param pictureLabel pictureLabel
      * @author 657518680@qq.com
-     * @date 2019/8/13
      * @since 1.0.0
      */
     private static void processTable(@NotNull XWPFDocument xwpfDocument,
@@ -132,11 +157,11 @@ public final class EasyWord {
                             Index index = new Index(t, r, c, p, i);
                             WordConstruct wordConstruct = new WordConstruct(table, row, cell, paragraph, run);
                             boolean flag = Processor.processStaticLabel(staticLabel, wordConstruct, index);
-                            if(!flag){
+                            if (!flag) {
                                 flag = Processor.processPicture4Table(pictureLabel, wordConstruct, index);
                             }
                             boolean result = false;
-                            if(!flag){
+                            if (!flag) {
                                 result = Processor.processTable4Table(tableLabel, wordConstruct, index);
                             }
                             t = index.getTableIndex();

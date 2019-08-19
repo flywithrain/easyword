@@ -1,12 +1,9 @@
 package com.thunisoft.easyword.bo
-
-import org.apache.poi.xwpf.usermodel.*
-
 /**
+ * 2019/8/13 9:35
  * DefaultCustomization
  *
  * @author 657518680@qq.com
- * @date 2019/8/13 9:35
  * @since 1.0.0
  */
 class DefaultCustomization implements Customization {

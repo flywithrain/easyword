@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Processor
+ * 2019/8/13 19:07
+ * Processor of EasyWord
  *
  * @author 657518680@qq.com
- * @date 2019/8/13 19:07
  * @since 1.0.0
  */
 final class Processor {
@@ -27,6 +27,17 @@ final class Processor {
     private Processor() {
     }
 
+    /**
+     * 2019/8/19
+     * process the staticLabel for both paragraph and table in word
+     *
+     * @param staticLabel   staticLabel
+     * @param wordConstruct wordConstruct {@link WordConstruct}
+     * @param index         index{@link Index}
+     * @return true: already processed; false: not processed
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
     static boolean processStaticLabel(Map<String, Customization> staticLabel,
                                       WordConstruct wordConstruct,
                                       Index index) {
@@ -51,6 +62,18 @@ final class Processor {
         return false;
     }
 
+    /**
+     * 2019/8/19
+     * process the dynamic label for paragraph
+     *
+     * @param xwpfDocument  xwpfDocument
+     * @param dynamicLabel  dynamicLabel
+     * @param wordConstruct wordConstruct {@link WordConstruct}
+     * @param index         index{@link Index}
+     * @return true: already processed; false: not processed
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
     static boolean processDynamicLabel4Paragraph(XWPFDocument xwpfDocument,
                                                  Map<String, List<Customization>> dynamicLabel,
                                                  WordConstruct wordConstruct,
@@ -81,6 +104,17 @@ final class Processor {
         return false;
     }
 
+    /**
+     * 2019/8/19
+     * process the table label (dynamic label in table) for table
+     *
+     * @param tableLabel    tableLabel
+     * @param wordConstruct wordConstruct {@link WordConstruct}
+     * @param index         index{@link Index}
+     * @return true: already processed; false: not processed
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
     static boolean processTable4Table(Map<String, List<List<Customization>>> tableLabel,
                                       WordConstruct wordConstruct,
                                       Index index) {
@@ -144,6 +178,17 @@ final class Processor {
         return false;
     }
 
+    /**
+     * 2019/8/19
+     * process the picture label for paragraph
+     *
+     * @param pictureLabel  pictureLabel
+     * @param wordConstruct wordConstruct {@link WordConstruct}
+     * @param index         index{@link Index}
+     * @return true: already processed; false: not processed
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
     static boolean processPicture4Paragraph(Map<String, Customization> pictureLabel,
                                             WordConstruct wordConstruct,
                                             Index index) throws IOException, InvalidFormatException {
@@ -172,9 +217,20 @@ final class Processor {
         return false;
     }
 
+    /**
+     * 2019/8/19
+     * process the picture label for table
+     *
+     * @param pictureLabel  pictureLabel
+     * @param wordConstruct wordConstruct {@link WordConstruct}
+     * @param index         index{@link Index}
+     * @return true: already processed; false: not processed
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
     static boolean processPicture4Table(Map<String, Customization> pictureLabel,
-                                     WordConstruct wordConstruct,
-                                     Index index) throws IOException, InvalidFormatException {
+                                        WordConstruct wordConstruct,
+                                        Index index) throws IOException, InvalidFormatException {
         XWPFTableCell cell = wordConstruct.getCell();
         XWPFRun run = wordConstruct.getRun();
         String text = run.text();
@@ -202,6 +258,14 @@ final class Processor {
         return false;
     }
 
+    /**
+     * 2019/8/19
+     * get the vanish attribute and set the value to STOnOff.FALSE {@link STOnOff#FALSE}
+     *
+     * @param ctrPr the attribute of the run of the word
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
     private static void processVanish(CTRPr ctrPr) {
         if (ctrPr != null) {
             CTOnOff vanish = ctrPr.getVanish();
@@ -211,6 +275,15 @@ final class Processor {
         }
     }
 
+    /**
+     * 2019/8/19
+     * get the first paragraph of the cell if not exist then create a new paragraph
+     *
+     * @param tableCell the cell of table
+     * @return the first paragraph
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
     private static XWPFParagraph getFirstTableParagraph(XWPFTableCell tableCell) {
         List<XWPFParagraph> paragraphList = tableCell.getParagraphs();
         if (paragraphList.isEmpty()) {
@@ -219,12 +292,32 @@ final class Processor {
         return paragraphList.get(0);
     }
 
+    /**
+     * 2019/8/19
+     * determine if there is a next row that can be used for table label rather than create a new row
+     *
+     * @param table    table
+     * @param rowIndex rowIndex {@link Index#getRowIndex()}
+     * @param style    the string of the style{@linkplain Processor#getTrPrString}
+     * @param j        the index of the list of the value of the table label
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
     private static boolean isHasNextRow(XWPFTable table, int rowIndex, String style, int j) {
         return table.getRow(rowIndex + 1) != null
                 && style.equals(getTrPrString(table.getRow(rowIndex + 1).getCtRow().getTrPr()))
                 && j != 0;
     }
 
+    /**
+     * 2019/8/19
+     * get the string of ctTrPr if null then return empty string
+     *
+     * @param ctTrPr the attribute of the run of the word
+     * @return the string of the ctTrPr
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
     private static String getTrPrString(CTTrPr ctTrPr) {
         if (ctTrPr == null) {
             return "";
