@@ -4,14 +4,19 @@ import com.thunisoft.easyword.bo.Customization;
 import com.thunisoft.easyword.bo.Index;
 import com.thunisoft.easyword.bo.WordConstruct;
 import com.thunisoft.easyword.util.AnalyzeFileType;
+import com.thunisoft.easyword.util.AnalyzeImageSize;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +25,8 @@ import java.util.Map;
  * Processor of EasyWord
  *
  * @author 657518680@qq.com
- * @since 1.0.0
+ * @since alpha
+ * @version beta
  */
 final class Processor {
 
@@ -36,7 +42,7 @@ final class Processor {
      * @param index         index{@link Index}
      * @return true: already processed; false: not processed
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     static boolean processStaticLabel(Map<String, Customization> staticLabel,
                                       WordConstruct wordConstruct,
@@ -72,7 +78,7 @@ final class Processor {
      * @param index         index{@link Index}
      * @return true: already processed; false: not processed
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     static boolean processDynamicLabel4Paragraph(XWPFDocument xwpfDocument,
                                                  Map<String, List<Customization>> dynamicLabel,
@@ -113,7 +119,7 @@ final class Processor {
      * @param index         index{@link Index}
      * @return true: already processed; false: not processed
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     static boolean processTable4Table(Map<String, List<List<Customization>>> tableLabel,
                                       WordConstruct wordConstruct,
@@ -187,7 +193,7 @@ final class Processor {
      * @param index         index{@link Index}
      * @return true: already processed; false: not processed
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     static boolean processPicture4Paragraph(Map<String, Customization> pictureLabel,
                                             WordConstruct wordConstruct,
@@ -205,11 +211,7 @@ final class Processor {
                 processVanish(ctrPr);
                 newRun.getCTR().setRPr(ctrPr);
                 paragraph.removeRun(rIndex + 1);
-                newRun.addPicture(customization.getPicture(),
-                        AnalyzeFileType.getFileType(customization.getPicture()),
-                        customization.getPictureName(),
-                        Units.toEMU(customization.getWidth()),
-                        Units.toEMU(customization.getHeight()));
+                processPicture(customization, newRun);
                 customization.handle(wordConstruct, index);
                 return true;
             }
@@ -226,7 +228,7 @@ final class Processor {
      * @param index         index{@link Index}
      * @return true: already processed; false: not processed
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     static boolean processPicture4Table(Map<String, Customization> pictureLabel,
                                         WordConstruct wordConstruct,
@@ -245,11 +247,7 @@ final class Processor {
                 XWPFRun newRun = cell.addParagraph().createRun();
                 newRun.removeBreak();
                 newRun.removeCarriageReturn();
-                newRun.addPicture(customization.getPicture(),
-                        AnalyzeFileType.getFileType(customization.getPicture()),
-                        customization.getPictureName(),
-                        Units.toEMU(customization.getWidth()),
-                        Units.toEMU(customization.getHeight()));
+                processPicture(customization, newRun);
                 cell.removeParagraph(0);
                 customization.handle(wordConstruct, index);
                 return true;
@@ -259,12 +257,78 @@ final class Processor {
     }
 
     /**
+     * 2019/8/20 14:15
+     *
+     * @param customization the all info of picture
+     * @param newRun        the run created to save image
+     * @author 657518680@qq.com
+     * @since beta
+     */
+    private static void processPicture(Customization customization,
+                                       XWPFRun newRun) throws IOException, InvalidFormatException {
+        byte[] bytes = IOUtils.toByteArray(customization.getPicture());
+        int width = customization.getWidth();
+        int height = customization.getHeight();
+        if (width <= 0 || height <= 0) {
+            Map<String, Integer> size = AnalyzeImageSize.getImageSize(new ByteArrayInputStream(bytes));
+            width = size.get("width");
+            height = size.get("height");
+        }
+        newRun.addPicture(new ByteArrayInputStream(bytes),
+                AnalyzeFileType.getFileType(bytes),
+                customization.getPictureName(),
+                Units.pixelToEMU(width),
+                Units.pixelToEMU(height));
+    }
+
+    /**
+     * 2019/8/19 21:53
+     * Merge the word other than the first word into the first word
+     *
+     * @param newDocument  the document of the first word and will create the final word
+     * @param mainPart     the main part of the first word and will keep adding mainPart of other words
+     * @param xwpfDocument the document of the word that except the first
+     * @param ctBody       the body of the word that except the first
+     * @throws InvalidFormatException InvalidFormatException
+     * @author 657518680@qq.com
+     * @since beta
+     */
+    static void mergeOther2First(XWPFDocument newDocument,
+                                 StringBuilder mainPart,
+                                 XWPFDocument xwpfDocument,
+                                 CTBody ctBody) throws InvalidFormatException {
+        XmlOptions xmlOptions = new XmlOptions();
+        xmlOptions.setSaveOuter();
+        String appendString = ctBody.xmlText(xmlOptions);
+        String addPart = appendString
+                .substring(appendString.indexOf('>') + 1, appendString.lastIndexOf('<'));
+        List<XWPFPictureData> allPictures = xwpfDocument.getAllPictures();
+        if (allPictures != null) {
+            // 记录图片合并前及合并后的ID
+            Map<String, String> map = new HashMap<>();
+            for (XWPFPictureData picture : allPictures) {
+                String before = xwpfDocument.getRelationId(picture);
+                //将原文档中的图片加入到目标文档中
+                String after = newDocument.addPictureData(picture.getData(), Document.PICTURE_TYPE_PNG);
+                map.put(before, after);
+            }
+            if (!map.isEmpty()) {
+                //对xml字符串中图片ID进行替换
+                for (Map.Entry<String, String> set : map.entrySet()) {
+                    addPart = addPart.replace(set.getKey(), set.getValue());
+                }
+            }
+        }
+        mainPart.append(addPart);
+    }
+
+    /**
      * 2019/8/19
      * get the vanish attribute and set the value to STOnOff.FALSE {@link STOnOff#FALSE}
      *
      * @param ctrPr the attribute of the run of the word
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     private static void processVanish(CTRPr ctrPr) {
         if (ctrPr != null) {
@@ -282,7 +346,7 @@ final class Processor {
      * @param tableCell the cell of table
      * @return the first paragraph
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     private static XWPFParagraph getFirstTableParagraph(XWPFTableCell tableCell) {
         List<XWPFParagraph> paragraphList = tableCell.getParagraphs();
@@ -301,7 +365,7 @@ final class Processor {
      * @param style    the string of the style{@linkplain Processor#getTrPrString}
      * @param j        the index of the list of the value of the table label
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     private static boolean isHasNextRow(XWPFTable table, int rowIndex, String style, int j) {
         return table.getRow(rowIndex + 1) != null
@@ -316,7 +380,7 @@ final class Processor {
      * @param ctTrPr the attribute of the run of the word
      * @return the string of the ctTrPr
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     private static String getTrPrString(CTTrPr ctTrPr) {
         if (ctTrPr == null) {

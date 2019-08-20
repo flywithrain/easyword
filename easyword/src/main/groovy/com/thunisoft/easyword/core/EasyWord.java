@@ -3,9 +3,12 @@ package com.thunisoft.easyword.core;
 import com.thunisoft.easyword.bo.Customization;
 import com.thunisoft.easyword.bo.Index;
 import com.thunisoft.easyword.bo.WordConstruct;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xwpf.usermodel.*;
+import org.apache.xmlbeans.XmlException;
 import org.jetbrains.annotations.NotNull;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +22,8 @@ import java.util.Map;
  * EasyWord
  *
  * @author 657518680@qq.com
- * @since 1.0.0
+ * @since alpha
+ * @version beta
  */
 public final class EasyWord {
 
@@ -37,7 +41,7 @@ public final class EasyWord {
      * @throws IOException            IOException
      * @throws InvalidFormatException InvalidFormatException
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     public static void replaceLabel(@NotNull InputStream inputStream,
                                     @NotNull OutputStream outputStream,
@@ -62,7 +66,7 @@ public final class EasyWord {
      * @throws IOException            IOException
      * @throws InvalidFormatException InvalidFormatException
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     public static void replaceLabel(@NotNull InputStream inputStream,
                                     @NotNull OutputStream outputStream,
@@ -80,6 +84,59 @@ public final class EasyWord {
     }
 
     /**
+     * 2019/8/19 21:53
+     * merge words
+     *
+     * @param wordList     the list of inputStream of word that need to be merge to one
+     * @param outputStream the word that merged by the wordList
+     * @throws IOException            IOException
+     * @throws InvalidFormatException InvalidFormatException
+     * @throws XmlException           XmlException
+     * @author 657518680@qq.com
+     * @since beta
+     */
+    public static void mergeWord(List<InputStream> wordList, OutputStream outputStream)
+            throws IOException, InvalidFormatException, XmlException {
+        if (CollectionUtils.isEmpty(wordList)) {
+            return;
+        }
+        XWPFDocument newDocument = null;
+        CTBody newCtBody = null;
+        String newString = null;
+        String prefix = null;
+        StringBuilder mainPart = new StringBuilder();
+        for (int i = 0; i < wordList.size(); ++i) {
+            try (InputStream word = wordList.get(i)) {
+                XWPFDocument xwpfDocument = new XWPFDocument(word);
+                if (i != wordList.size() - 1) {
+                    XWPFRun run = xwpfDocument.getLastParagraph().createRun();
+                    run.addBreak(BreakType.PAGE);
+                }
+                CTBody ctBody = xwpfDocument.getDocument().getBody();
+                if (i == 0) {
+                    newDocument = xwpfDocument;
+                    newCtBody = ctBody;
+                    newString = newCtBody.xmlText();
+                    prefix = newString.substring(0, newString.indexOf('>') + 1);
+                    mainPart.append(newString, newString.indexOf('>') + 1, newString.lastIndexOf('<'));
+                } else {
+                    Processor.mergeOther2First(newDocument, mainPart, xwpfDocument, ctBody);
+                }
+            }
+        }
+        String sufix = null;
+        if (newString != null) {
+            sufix = newString.substring(newString.lastIndexOf('<'));
+        }
+        if (newCtBody != null) {
+            newCtBody.set(CTBody.Factory.parse(prefix + mainPart.toString() + sufix));
+        }
+        if (newDocument != null) {
+            newDocument.write(outputStream);
+        }
+    }
+
+    /**
      * 2019/8/13
      * description
      *
@@ -88,7 +145,7 @@ public final class EasyWord {
      * @param dynamicLabel dynamicLabel
      * @param pictureLabel pictureLabel
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     private static void processParagraph(@NotNull XWPFDocument xwpfDocument,
                                          Map<String, Customization> staticLabel,
@@ -131,7 +188,7 @@ public final class EasyWord {
      * @param tableLabel   tableLabel
      * @param pictureLabel pictureLabel
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     private static void processTable(@NotNull XWPFDocument xwpfDocument,
                                      Map<String, Customization> staticLabel,

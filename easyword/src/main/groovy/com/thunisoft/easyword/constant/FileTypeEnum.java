@@ -7,7 +7,7 @@ import org.apache.poi.xwpf.usermodel.Document;
  * FileType
  *
  * @author 657518680@qq.com
- * @since 1.0.0
+ * @since alpha
  */
 public enum FileTypeEnum {
 

@@ -3,8 +3,6 @@ package com.thunisoft.easyword.util;
 import com.thunisoft.easyword.constant.FileTypeEnum;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Locale;
 
 /**
@@ -12,7 +10,8 @@ import java.util.Locale;
  * analyzeFileType
  *
  * @author 657518680@qq.com
- * @since 1.0.0
+ * @since alpha
+ * @version beta
  */
 public final class AnalyzeFileType {
 
@@ -28,18 +27,16 @@ public final class AnalyzeFileType {
      * 2019/8/19
      * analyze the type of image through the file header
      *
-     * @param inputStream the inputStream of the picture
+     * @param bytes the byte array of the picture
      * @return -1:is not image; other:the type of the picture{@link FileTypeEnum}
-     * @throws IOException IOException
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
-    public static int getFileType(@NotNull InputStream inputStream) throws IOException {
-        int temp;
+    public static int getFileType(@NotNull byte[] bytes) {
         int i = 0;
         StringBuilder builder = new StringBuilder();
-        while ((temp = inputStream.read()) != -1 && i < MAX_LENGTH) {
-            builder.append(String.format("%02X", temp));
+        while (i < MAX_LENGTH && i < bytes.length) {
+            builder.append(String.format("%02X", bytes[i]));
             i++;
         }
         String hex = builder.toString().toUpperCase(Locale.ENGLISH);

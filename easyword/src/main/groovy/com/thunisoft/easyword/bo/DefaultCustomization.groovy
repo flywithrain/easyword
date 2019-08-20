@@ -4,7 +4,7 @@ package com.thunisoft.easyword.bo
  * DefaultCustomization
  *
  * @author 657518680@qq.com
- * @since 1.0.0
+ * @since alpha
  */
 class DefaultCustomization implements Customization {
 
@@ -28,6 +28,22 @@ class DefaultCustomization implements Customization {
         } else {
             this.text = text
         }
+    }
+
+    void setPicture(InputStream picture) {
+        this.picture = picture
+    }
+
+    void setPictureName(String pictureName) {
+        this.pictureName = pictureName
+    }
+
+    void setWidth(int width) {
+        this.width = width
+    }
+
+    void setHeight(int height) {
+        this.height = height
     }
 
     String getText() {

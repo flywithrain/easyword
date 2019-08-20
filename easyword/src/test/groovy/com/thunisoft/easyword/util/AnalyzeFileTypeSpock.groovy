@@ -1,6 +1,7 @@
 package com.thunisoft.easyword.util
 
 import com.thunisoft.easyword.constant.FileTypeEnum
+import org.apache.poi.util.IOUtils
 import spock.lang.Specification
 
 /**
@@ -10,10 +11,10 @@ class AnalyzeFileTypeSpock extends Specification {
 
     def "analyze the type of the file"() {
         expect:
-        AnalyzeFileType.getFileType(this.getClass().getClassLoader().getResourceAsStream('\\file\\' + file)) == type
+        AnalyzeFileType.getFileType(IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream('\\file\\' + file))) == type
 
         where:
-        file          | type
+        file     | type
         '1.docx' | -1
         '1.jpg'  | FileTypeEnum.JPEG.value
         '1.pdf'  | -1

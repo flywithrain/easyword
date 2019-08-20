@@ -7,7 +7,8 @@ import java.io.InputStream;
  * implement the interface to customize your requirement
  *
  * @author 657518680@qq.com
- * @since 1.0.0
+ * @since alpha
+ * @version beta
  */
 public interface Customization {
 
@@ -18,7 +19,7 @@ public interface Customization {
      * @param wordConstruct the struct of word in POI in paragraph only paragraph and run available
      * @param index         the index of attributes in wordConstruct
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     default void handle(WordConstruct wordConstruct, Index index) {
         // do nothing if need can override
@@ -30,7 +31,7 @@ public interface Customization {
      *
      * @return the text of the label
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     String getText();
 
@@ -40,7 +41,7 @@ public interface Customization {
      *
      * @return the inputStream of the picture
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     InputStream getPicture();
 
@@ -50,27 +51,29 @@ public interface Customization {
      *
      * @return the name of the picture
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     String getPictureName();
 
     /**
      * 2019/8/19
-     * get the width of the picture inputStream in EasyWord
+     * get the width in pixel of the picture inputStream in EasyWord
+     * if <=0 will use the native size of the image both height {@link Customization#getHeight()}
      *
      * @return the width of the picture
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     int getWidth();
 
     /**
      * 2019/8/19
-     * get the height of the picture inputStream in EasyWord
+     * get the height in pixel of the picture inputStream in EasyWord
+     * if <=0 will use the native size of the image both width {@link Customization#getWidth()}
      *
      * @return the height of the picture
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since alpha
      */
     int getHeight();
 

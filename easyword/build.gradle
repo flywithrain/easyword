@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.thunisoft'
-version = 'aplha'
+version = 'beta'
 sourceCompatibility = '1.8'
 def poiVersion = '4.1.0'
 
@@ -69,11 +69,10 @@ publishing{
     repositories{
         maven{
             credentials{
-                username ''
-                password ''
-                url ''
+                username 'dev'
+                password 'help'
             }
-
+            url 'http://repo.thunisoft.com/maven2/content/repositories/releases/'
         }
     }
 }
