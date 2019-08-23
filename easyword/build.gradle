@@ -39,7 +39,9 @@ tasks.withType(GroovyCompile) {
 }
 
 jar{
-
+    manifest{
+        attributes 'Manifest-Version': getArchiveVersion().get()
+    }
 }
 
 task sourceJar(type: Jar){
@@ -69,8 +71,7 @@ publishing{
     repositories{
         maven{
             credentials{
-                username 'dev'
-                password 'help'
+
             }
             url 'http://repo.thunisoft.com/maven2/content/repositories/releases/'
         }

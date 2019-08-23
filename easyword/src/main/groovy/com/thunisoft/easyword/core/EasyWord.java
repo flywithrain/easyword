@@ -22,10 +22,12 @@ import java.util.Map;
  * EasyWord
  *
  * @author 657518680@qq.com
- * @since alpha
  * @version beta
+ * @since alpha
  */
 public final class EasyWord {
+
+    private static final String HEAD = "<xml-fragment ";
 
     private EasyWord() {
 
@@ -102,8 +104,9 @@ public final class EasyWord {
         }
         XWPFDocument newDocument = null;
         CTBody newCtBody = null;
-        String newString = null;
-        String prefix = null;
+        String newString;
+        Map<String, Object> headMap = new HashMap<>(30);
+        String sufix = null;
         StringBuilder mainPart = new StringBuilder();
         for (int i = 0; i < wordList.size(); ++i) {
             try (InputStream word = wordList.get(i)) {
@@ -117,17 +120,19 @@ public final class EasyWord {
                     newDocument = xwpfDocument;
                     newCtBody = ctBody;
                     newString = newCtBody.xmlText();
-                    prefix = newString.substring(0, newString.indexOf('>') + 1);
+                    Processor.getXmlns(newString.substring(0, newString.indexOf('>')) + " ", headMap);
                     mainPart.append(newString, newString.indexOf('>') + 1, newString.lastIndexOf('<'));
+                    sufix = newString.substring(newString.lastIndexOf('<'));
                 } else {
-                    Processor.mergeOther2First(newDocument, mainPart, xwpfDocument, ctBody);
+                    Processor.mergeOther2First(newDocument, mainPart, xwpfDocument, ctBody, headMap);
                 }
             }
         }
-        String sufix = null;
-        if (newString != null) {
-            sufix = newString.substring(newString.lastIndexOf('<'));
+        StringBuilder prefix = new StringBuilder(HEAD);
+        for(Map.Entry xmlns : headMap.entrySet()){
+            prefix.append(xmlns.getValue());
         }
+        prefix.append(">");
         if (newCtBody != null) {
             newCtBody.set(CTBody.Factory.parse(prefix + mainPart.toString() + sufix));
         }

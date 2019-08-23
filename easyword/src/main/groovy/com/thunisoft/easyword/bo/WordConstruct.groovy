@@ -28,4 +28,5 @@ public class WordConstruct {
     XWPFTableCell cell
     XWPFParagraph paragraph
     XWPFRun run
+
 }

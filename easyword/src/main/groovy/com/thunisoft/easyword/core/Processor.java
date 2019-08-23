@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 2019/8/13 19:07
@@ -29,6 +31,15 @@ import java.util.Map;
  * @version beta
  */
 final class Processor {
+
+    /**
+     * 2019/8/23 11:03
+     * <p>
+     * get xml xmlns
+     *
+     * @since beta
+     */
+    private static final Pattern PATTERN = Pattern.compile("(xmlns(:[\\s\\S]+?)?)=[\\s\\S]+?\\s");
 
     private Processor() {
     }
@@ -256,6 +267,13 @@ final class Processor {
         return false;
     }
 
+    static void getXmlns(String head, Map<String, Object> headMap){
+        Matcher matcher = PATTERN.matcher(head);
+        while (matcher.find()){
+            headMap.put(matcher.group(1), matcher.group());
+        }
+    }
+
     /**
      * 2019/8/20 14:15
      *
@@ -296,10 +314,12 @@ final class Processor {
     static void mergeOther2First(XWPFDocument newDocument,
                                  StringBuilder mainPart,
                                  XWPFDocument xwpfDocument,
-                                 CTBody ctBody) throws InvalidFormatException {
+                                 CTBody ctBody,
+                                 Map<String, Object> headMap) throws InvalidFormatException {
         XmlOptions xmlOptions = new XmlOptions();
         xmlOptions.setSaveOuter();
         String appendString = ctBody.xmlText(xmlOptions);
+        getXmlns(appendString.substring(1, appendString.indexOf('>')) + " ", headMap);
         String addPart = appendString
                 .substring(appendString.indexOf('>') + 1, appendString.lastIndexOf('<'));
         List<XWPFPictureData> allPictures = xwpfDocument.getAllPictures();
@@ -309,7 +329,7 @@ final class Processor {
             for (XWPFPictureData picture : allPictures) {
                 String before = xwpfDocument.getRelationId(picture);
                 //将原文档中的图片加入到目标文档中
-                String after = newDocument.addPictureData(picture.getData(), Document.PICTURE_TYPE_PNG);
+                String after = newDocument.addPictureData(picture.getData(), picture.getPictureType());
                 map.put(before, after);
             }
             if (!map.isEmpty()) {
