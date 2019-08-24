@@ -24,8 +24,8 @@ EasyWord对外提供的方法都在com.thunisoft.easyword.core.EasyWord类中一
 ```java
 EasyWord.replaceLabel(fileInputStream, fileOutputStream, staticLabel);
 ```
-<span id="in">fileInputStream:这是模板的输入流；</span>
-<span id="ou">fileOutputStream：这是替换后文件的输出流；</span>
+<span id="in">fileInputStream:这是模板的输入流；</span>  
+<span id="ou">fileOutputStream：这是替换后文件的输出流；</span>  
 staticLabel：静态标签，类型是Map<String, Customization>，其中String就是模板中的标签，EasyWord采用replaceAll去替换String标签，替换内容即Customization中文字。
 
 #### 2. 动态标签的替换
