@@ -24,9 +24,9 @@ EasyWord对外提供的方法都在com.thunisoft.easyword.core.EasyWord类中一
 ```java
 EasyWord.replaceLabel(fileInputStream, fileOutputStream, staticLabel);
 ```
-<span id="in">fileInputStream:这是模板的输入流；</span>
-<span id="ou">fileOutputStream：这是替换后文件的输出流；</span>
-staticLabel：静态标签，类型是Map<String, Customization>，其中String就是模板中的标签，EasyWord采用replaceAll去替换String标签，替换内容即Customization中文字。
+<span id="in">fileInputStream:这是模板的输入流；</span>  
+<span id="ou">fileOutputStream：这是替换后文件的输出流；</span>  
+staticLabel：静态标签，类型是Map<String, Customization>，其中String就是模板中的标签，EasyWord采用replaceAll去替换String标签，替换内容即Customization中文字。  
 
 #### 2. 动态标签的替换
 
@@ -38,9 +38,9 @@ EasyWord.replaceLabel(fileInputStream,
                 new HashMap<>(0),
                 new HashMap<>(0));
 ```
-fileInputStream:<a href="#in">同上</a>;
-fileOutputStream:<a href="ou">同上</a>;
-dynamicLabel:动态标签，类型是Map<String, List<Customization>>，其中String就是模板中的标签，每一个Customization就是段落中的一行，List<Customization>就是回填内容的集合。
+fileInputStream:<a href="#in">同上</a>;  
+fileOutputStream:<a href="ou">同上</a>;  
+dynamicLabel:动态标签，类型是Map<String, List\<Customization>>，其中String就是模板中的标签，每一个Customization就是段落中的一行，List\<Customization>就是回填内容的集合
 
 #### 3. 列表标签的替换
 
@@ -52,9 +52,9 @@ EasyWord.replaceLabel(fileInputStream,
                 tableLabel,
                 new HashMap<>(0));
 ```
-fileInputStream:<a href="#in">同上</a>;
-fileOutputStream:<a href="ou">同上</a>;
-tableLabel:表格标签，类型是Map<String, List<List<Customization>>>，其中String就是模板中的标签，和dynamicLabel很相似，每一个Customization就是一个单元格（cell），每一个List<Customization>就是一行（row）,自然的List<List<Customization>> 就代表rows组成的表格
+fileInputStream:<a href="#in">同上</a>;  
+fileOutputStream:<a href="ou">同上</a>;  
+tableLabel:表格标签，类型是Map<String, List<List\<Customization>>>，其中String就是模板中的标签，和dynamicLabel很相似，每一个Customization就是一个单元格（cell），每一个List\<Customization>就是一行（row）,自然的List<List\<Customization>> 就代表rows组成的表格  
 
 #### 4. 图片标签的替换
 
@@ -66,9 +66,9 @@ EasyWord.replaceLabel(fileInputStream,
                 new HashMap<>(0),
                 pictureLabel);
 ```
-fileInputStream:<a href="#in">同上</a>;
-fileOutputStream:<a href="ou">同上</a>;
-pictureLabel:图片标签，类型是Map<String, Customization>，其中String就是模板中的标签，Customization中需实现getPicture（）以及图片相关的方法（当getWidth()和getHeight()方法获取到的像素是非自然数时EasyWord会按照图片原始大小展示）
+fileInputStream:<a href="#in">同上</a>;  
+fileOutputStream:<a href="ou">同上</a>;  
+pictureLabel:图片标签，类型是Map<String, Customization>，其中String就是模板中的标签，Customization中需实现getPicture（）以及图片相关的方法（当getWidth()和getHeight()方法获取到的像素是非自然数时EasyWord会按照图片原始大小展示）  
 
 #### 5.隐藏标签的替换
 隐藏标签在代码部分并没有什么不一样，区别在于往模板中打的标签是否是隐藏状态（关于word如何隐藏文字请自行百度）。无论标签是否是隐藏状态都会被检测到，而且一旦替换成功，EasyWord会将替换后的内容由隐藏状态变为可见状态。
@@ -77,13 +77,13 @@ pictureLabel:图片标签，类型是Map<String, Customization>，其中String�
 ```java
 EasyWord.mergeWord(wordList, outputStream);
 ```
-wordList：需要合并的文件流集合，按先后顺序进行合并；
-outputStream:合并后文件的输出流;
-word合并后每两个word之间会默认加一个换页符，目前没有开发定制化接口进行开关。
+wordList：需要合并的文件流集合，按先后顺序进行合并；  
+outputStream:合并后文件的输出流;  
+word合并后每两个word之间会默认加一个换页符，目前没有开发定制化接口进行开关。  
 
 #### 7.高级
 
-EasyWord的DefaultCustomization默认按照模板标签所在的样式进行回填替换，虽然大部分情况下我们都可以通过调整模板的样式来控制回填样式，但是如果有些样式不能通过模板来实现或者说在制作模板阶段压根还不知道样式怎么办呢？这时候我们需要实现Customization接口。
+EasyWord的DefaultCustomization默认按照模板标签所在的样式进行回填替换，虽然大部分情况下我们都可以通过调整模板的样式来控制回填样式，但是如果有些样式不能通过模板来实现或者说在制作模板阶段压根还不知道样式怎么办呢？这时候我们需要实现Customization接口。  
 Customization接口中handle方法能够获取到标签回填时刻替换内容所在的table、row、cell、paragraph、run以及他们对应的Index（关于word的结构比这不再详细赘述，要实现定制化需要对word以及POI有一定了解）
 
 ## Word如何打标签
