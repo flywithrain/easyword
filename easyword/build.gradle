@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.thunisoft'
-version = 'beta'
+version = '1.0.0'
 sourceCompatibility = '1.8'
 def poiVersion = '4.1.0'
 
@@ -76,4 +76,9 @@ publishing{
             url 'http://repo.thunisoft.com/maven2/content/repositories/releases/'
         }
     }
+}
+
+task getAllJar(type: Copy){
+    from configurations.compile.collect()
+    into "$buildDir\\lib"
 }

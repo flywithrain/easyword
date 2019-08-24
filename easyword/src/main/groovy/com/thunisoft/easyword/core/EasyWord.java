@@ -1,6 +1,7 @@
 package com.thunisoft.easyword.core;
 
 import com.thunisoft.easyword.bo.Customization;
+import com.thunisoft.easyword.bo.DefaultCustomization;
 import com.thunisoft.easyword.bo.Index;
 import com.thunisoft.easyword.bo.WordConstruct;
 import org.apache.commons.collections4.CollectionUtils;
@@ -13,6 +14,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +36,53 @@ public final class EasyWord {
     }
 
     /**
+     * 2019/8/24 14:58
+     * a simplified version of {@link EasyWord#replaceLabel(InputStream, OutputStream, Map)}
+     *
+     * @param inputStream    inputStream
+     * @param outputStream   outputStream
+     * @param staticLabelite a simplified version of staticLabel
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
+    public static void replaceLabelite(@NotNull InputStream inputStream,
+                                       @NotNull OutputStream outputStream,
+                                       @NotNull Map<String, String> staticLabelite)
+            throws IOException, InvalidFormatException {
+        replaceLabel(inputStream, outputStream, staticLite2Full(staticLabelite));
+    }
+
+    /**
+     * 2019/8/24 14:48
+     * a simplified version of {@link EasyWord#replaceLabel(InputStream, OutputStream, Map, Map, Map, Map)}
+     *
+     * @param inputStream     inputStream
+     * @param outputStream    outputStream
+     * @param staticLabelite  a simplified version of staticLabel
+     * @param dynamicLabelite a simplified version of dynamicLabel
+     * @param tableLabelite   a simplified version of tableLabel
+     * @param pictureLabel    pictureLabel
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
+    public static void replaceLabelite(@NotNull InputStream inputStream,
+                                       @NotNull OutputStream outputStream,
+                                       @NotNull Map<String, String> staticLabelite,
+                                       @NotNull Map<String, List<String>> dynamicLabelite,
+                                       @NotNull Map<String, List<List<String>>> tableLabelite,
+                                       @NotNull Map<String, Customization> pictureLabel)
+            throws IOException, InvalidFormatException {
+        replaceLabel(inputStream,
+                outputStream,
+                staticLite2Full(staticLabelite),
+                dynamicLite2Full(dynamicLabelite),
+                tableLite2Full(tableLabelite),
+                pictureLabel);
+    }
+
+    /**
      * 2019/8/19
-     * description
+     * replace the label in the word
      *
      * @param inputStream  inputStream
      * @param outputStream outputStream
@@ -57,7 +104,7 @@ public final class EasyWord {
 
     /**
      * 2019/8/13
-     * description
+     * replace the label in the word
      *
      * @param inputStream  inputStream
      * @param outputStream outputStream
@@ -129,7 +176,7 @@ public final class EasyWord {
             }
         }
         StringBuilder prefix = new StringBuilder(HEAD);
-        for(Map.Entry xmlns : headMap.entrySet()){
+        for (Map.Entry xmlns : headMap.entrySet()) {
             prefix.append(xmlns.getValue());
         }
         prefix.append(">");
@@ -239,6 +286,66 @@ public final class EasyWord {
                 }
             }
         }
+    }
+
+    /**
+     * 2019/8/24 14:48
+     * Convert staticLabelite to staticLabel
+     *
+     * @param staticLabelite a simplified version of staticLabel
+     * @return staticLabel
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
+    private static Map<String, Customization> staticLite2Full(Map<String, String> staticLabelite) {
+        Map<String, Customization> staticLabel = new HashMap<>(staticLabelite.size());
+        for (Map.Entry<String, String> entry : staticLabelite.entrySet()) {
+            staticLabel.put(entry.getKey(), new DefaultCustomization(entry.getValue()));
+        }
+        return staticLabel;
+    }
+
+    /**
+     * 2019/8/24 14:48
+     * Convert dynamicLabelite to dynamicLabel
+     *
+     * @param dynamicLabelite a simplified version of dynamicLabel
+     * @return dynamicLabel
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
+    private static Map<String, List<Customization>> dynamicLite2Full(Map<String, List<String>> dynamicLabelite) {
+        Map<String, List<Customization>> dynamicLabel = new HashMap<>(dynamicLabelite.size());
+        for (Map.Entry<String, List<String>> entry : dynamicLabelite.entrySet()) {
+            List<Customization> temp = new ArrayList<>(entry.getValue().size());
+            entry.getValue().forEach(str -> temp.add(new DefaultCustomization(str)));
+            dynamicLabel.put(entry.getKey(), temp);
+        }
+        return dynamicLabel;
+    }
+
+    /**
+     * 2019/8/24 14:48
+     * Convert tableLabelite to tableLabel
+     *
+     * @param tableLabelite a simplified version of tableLabel
+     * @return tableLabel
+     * @author 657518680@qq.com
+     * @since 1.0.0
+     */
+    private static Map<String, List<List<Customization>>>
+    tableLite2Full(Map<String, List<List<String>>> tableLabelite) {
+        Map<String, List<List<Customization>>> tableLabel = new HashMap<>(tableLabelite.size());
+        for (Map.Entry<String, List<List<String>>> entry : tableLabelite.entrySet()) {
+            List<List<Customization>> rows = new ArrayList<>(entry.getValue().size());
+            entry.getValue().forEach((List<String> list) -> {
+                List<Customization> row = new ArrayList<>(list.size());
+                list.forEach(str -> row.add(new DefaultCustomization(str)));
+                rows.add(row);
+            });
+            tableLabel.put(entry.getKey(), rows);
+        }
+        return tableLabel;
     }
 
 }
