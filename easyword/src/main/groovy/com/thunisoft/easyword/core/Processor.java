@@ -72,6 +72,7 @@ final class Processor {
                 newRun.getCTR().setRPr(ctrPr);
                 paragraph.removeRun(rIndex + 1);
                 newRun.setText(text.replaceAll(key, customization.getText()));
+                wordConstruct.setRun(newRun);
                 customization.handle(wordConstruct, index);
                 return true;
             }
@@ -109,6 +110,7 @@ final class Processor {
                     XWPFRun newRun = newPara.createRun();
                     newRun.getCTR().setRPr(run.getCTR().getRPr());
                     newRun.setText(customization.getText());
+                    wordConstruct.setRun(newRun);
                     customization.handle(wordConstruct, index);
                 }
                 xwpfDocument.removeBodyElement(xwpfDocument.getPosOfParagraph(paragraph));
@@ -167,6 +169,8 @@ final class Processor {
                             XWPFRun xwpfRun = xwpfParagraph.createRun();
                             xwpfRun.getCTR().setRPr(ctrPr);
                             xwpfRun.setText(customization.getText());
+                            wordConstruct.setParagraph(xwpfParagraph);
+                            wordConstruct.setRun(xwpfRun);
                             customization.handle(wordConstruct, index);
                         }
                         ++rowIndex;
@@ -181,6 +185,10 @@ final class Processor {
                             XWPFRun newRun = newParagraph.createRun();
                             newRun.getCTR().setRPr(ctrPr);
                             newRun.setText(customization.getText());
+                            wordConstruct.setRow(newTableRow);
+                            wordConstruct.setCell(newTableCell);
+                            wordConstruct.setParagraph(newParagraph);
+                            wordConstruct.setRun(newRun);
                             customization.handle(wordConstruct, index);
                         }
                         newTableRow.getCtRow().setTrPr(ctTrPr);
@@ -222,6 +230,7 @@ final class Processor {
                 processVanish(ctrPr);
                 newRun.getCTR().setRPr(ctrPr);
                 paragraph.removeRun(rIndex + 1);
+                wordConstruct.setRun(newRun);
                 processPicture(customization, newRun);
                 customization.handle(wordConstruct, index);
                 return true;
@@ -255,11 +264,14 @@ final class Processor {
                 for (int j = 0; j < tempParagraphs.size(); j++) {
                     cell.removeParagraph(j);
                 }
-                XWPFRun newRun = cell.addParagraph().createRun();
+                XWPFParagraph newParagraph = cell.addParagraph();
+                XWPFRun newRun = newParagraph.createRun();
                 newRun.removeBreak();
                 newRun.removeCarriageReturn();
                 processPicture(customization, newRun);
                 cell.removeParagraph(0);
+                wordConstruct.setParagraph(newParagraph);
+                wordConstruct.setRun(newRun);
                 customization.handle(wordConstruct, index);
                 return true;
             }
