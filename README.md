@@ -94,12 +94,13 @@ Customization接口中handle方法能够获取到标签回填时刻替换内容�
 - **Aplha** 2019-08-19
 	* 从项目中抽离代码，初始化项目；
 	* 增加单元测试，修复部分bug；
-
 - **Beta** 2019-08-23
 	* 完善隐藏标签替换功能；
 	* 新增word合并功能；
 	* 修复所有已知bug；
-
 - **1.0.0** 2019-08-24
 	* 新增replaceLabelite方法，简化替换操作
 	* 修复Customization设置WordConstruct不正确bug
+- **1.0.1** 2019-09-20
+  - 修复pom引用文件中类型<type>缺失bug
+  - 修复表格回填图片清空cell导致index出错bug
