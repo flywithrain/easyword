@@ -6,7 +6,7 @@
 ​	作者在好几个项目中遇到对word的操作，这些代码基本都是重复模板代码，加上写代码的人对POI不熟悉或者POI版本自身bug导致或多或少的一些问题，为了以后偷懒做出这么个东西。
 
 ## 在哪里下载EasyWord
-github：https://github.com/flywithrain/easyword
+github：https://github.com/flywithrain/easyword  
 EasyWord毕竟难登大雅之堂，所以中心仓库是没有的，大家要用可以放到自己本地仓库或者私有仓库
 
 ## EasyWord如何使用

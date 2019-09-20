@@ -214,7 +214,7 @@ final class Processor {
      * @author 657518680@qq.com
      * @since alpha
      */
-    static boolean processPicture4Paragraph(Map<String, Customization> pictureLabel,
+    static boolean processPicture4All(Map<String, Customization> pictureLabel,
                                             WordConstruct wordConstruct,
                                             Index index) throws IOException, InvalidFormatException {
         XWPFParagraph paragraph = wordConstruct.getParagraph();
@@ -232,46 +232,6 @@ final class Processor {
                 paragraph.removeRun(rIndex + 1);
                 wordConstruct.setRun(newRun);
                 processPicture(customization, newRun);
-                customization.handle(wordConstruct, index);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 2019/8/19
-     * process the picture label for table
-     *
-     * @param pictureLabel  pictureLabel
-     * @param wordConstruct wordConstruct {@link WordConstruct}
-     * @param index         index{@link Index}
-     * @return true: already processed; false: not processed
-     * @author 657518680@qq.com
-     * @since alpha
-     */
-    static boolean processPicture4Table(Map<String, Customization> pictureLabel,
-                                        WordConstruct wordConstruct,
-                                        Index index) throws IOException, InvalidFormatException {
-        XWPFTableCell cell = wordConstruct.getCell();
-        XWPFRun run = wordConstruct.getRun();
-        String text = run.text();
-        for (Map.Entry<String, Customization> entry : pictureLabel.entrySet()) {
-            Customization customization = entry.getValue();
-            String key = entry.getKey();
-            if (key.equals(text)) {
-                List<XWPFParagraph> tempParagraphs = cell.getParagraphs();
-                for (int j = 0; j < tempParagraphs.size(); j++) {
-                    cell.removeParagraph(j);
-                }
-                XWPFParagraph newParagraph = cell.addParagraph();
-                XWPFRun newRun = newParagraph.createRun();
-                newRun.removeBreak();
-                newRun.removeCarriageReturn();
-                processPicture(customization, newRun);
-                cell.removeParagraph(0);
-                wordConstruct.setParagraph(newParagraph);
-                wordConstruct.setRun(newRun);
                 customization.handle(wordConstruct, index);
                 return true;
             }

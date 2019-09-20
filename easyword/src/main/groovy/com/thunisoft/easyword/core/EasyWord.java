@@ -216,7 +216,7 @@ public final class EasyWord {
                 //是否已经处理过run
                 boolean flag = Processor.processStaticLabel(staticLabel, wordConstruct, index);
                 if (!flag) {
-                    flag = Processor.processPicture4Paragraph(pictureLabel, wordConstruct, index);
+                    flag = Processor.processPicture4All(pictureLabel, wordConstruct, index);
                 }
                 boolean result = false;
                 if (!flag) {
@@ -267,7 +267,7 @@ public final class EasyWord {
                             WordConstruct wordConstruct = new WordConstruct(table, row, cell, paragraph, run);
                             boolean flag = Processor.processStaticLabel(staticLabel, wordConstruct, index);
                             if (!flag) {
-                                flag = Processor.processPicture4Table(pictureLabel, wordConstruct, index);
+                                flag = Processor.processPicture4All(pictureLabel, wordConstruct, index);
                             }
                             boolean result = false;
                             if (!flag) {
