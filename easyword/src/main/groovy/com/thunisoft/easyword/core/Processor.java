@@ -12,9 +12,10 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.impl.CTPPrImpl;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.impl.CTRPrImpl;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +28,8 @@ import java.util.regex.Pattern;
  * Processor of EasyWord
  *
  * @author 657518680@qq.com
+ * @version 1.1.0
  * @since alpha
- * @version beta
  */
 final class Processor {
 
@@ -136,7 +137,7 @@ final class Processor {
      */
     static boolean processTable4Table(Map<String, List<List<Customization>>> tableLabel,
                                       WordConstruct wordConstruct,
-                                      Index index) {
+                                      Index index) throws IOException, ClassNotFoundException {
         XWPFTable table = wordConstruct.getTable();
         XWPFTableRow row = wordConstruct.getRow();
         XWPFParagraph paragraph = wordConstruct.getParagraph();
@@ -148,55 +149,145 @@ final class Processor {
             List<List<Customization>> listList = entry.getValue();
             if (key.equals(text)) {
                 CTTrPr ctTrPr = row.getCtRow().getTrPr();
+                CTPPr ctpPr = paragraph.getCTP().getPPr();
+                CTPPr deepCopyPpr = deepClone((CTPPrImpl)ctpPr);
                 String style = getTrPrString(ctTrPr);
                 List<XWPFTableCell> tableCells = row.getTableCells();
                 List<CTTcPr> ctTcPrList = new ArrayList<>();
                 for (XWPFTableCell temp : tableCells) {
                     ctTcPrList.add(temp.getCTTc().getTcPr());
                 }
-                int temp = rowIndex;
                 for (int j = 0; j < listList.size(); j++) {
                     List<Customization> list = listList.get(j);
-                    CTRPr ctrPr = run.getCTR().getRPr();
-                    Processor.processVanish(ctrPr);
-                    XWPFTableRow newTableRow;
-                    if (isHasNextRow(table, rowIndex, style, j)) {
-                        newTableRow = table.getRow(rowIndex + 1);
+                    CTRPr deepCopyRpr = null;
+                    if(j == 0){
+                        CTRPr ctrPr = run.getCTR().getRPr();
+                        deepCopyRpr = deepClone((CTRPrImpl)ctrPr);
+                    }
+                    if (isTheNextRow(table, rowIndex, style, j)) {
+                        XWPFTableRow newTableRow = table.getRow(rowIndex);
                         for (int k = 0; k < list.size(); k++) {
                             Customization customization = list.get(k);
                             XWPFTableCell tableCell = newTableRow.getCell(k);
+                            clearCell(tableCell);
                             XWPFParagraph xwpfParagraph = getFirstTableParagraph(tableCell);
+                            xwpfParagraph.getCTP().setPPr(deepCopyPpr);
                             XWPFRun xwpfRun = xwpfParagraph.createRun();
-                            xwpfRun.getCTR().setRPr(ctrPr);
+                            xwpfRun.getCTR().setRPr(deepCopyRpr);
                             xwpfRun.setText(customization.getText());
                             wordConstruct.setParagraph(xwpfParagraph);
                             wordConstruct.setRun(xwpfRun);
+                            index.setpIndex(0);
+                            index.setrIndex(0);
                             customization.handle(wordConstruct, index);
                         }
-                        ++rowIndex;
                     } else {
-                        newTableRow = table.insertNewTableRow(rowIndex + 1);
-                        for (int k = 0; k < list.size(); k++) {
-                            Customization customization = list.get(k);
+                        XWPFTableRow newTableRow = table.insertNewTableRow(rowIndex);
+                        for (int k = 0; k < tableCells.size(); k++) {
                             XWPFTableCell newTableCell = newTableRow.addNewTableCell();
-                            newTableCell.getCTTc().setTcPr(ctTcPrList.get(k));
-                            XWPFParagraph newParagraph = getFirstTableParagraph(newTableCell);
-                            newParagraph.getCTP().setPPr(paragraph.getCTP().getPPr());
-                            XWPFRun newRun = newParagraph.createRun();
-                            newRun.getCTR().setRPr(ctrPr);
-                            newRun.setText(customization.getText());
-                            wordConstruct.setRow(newTableRow);
-                            wordConstruct.setCell(newTableCell);
-                            wordConstruct.setParagraph(newParagraph);
-                            wordConstruct.setRun(newRun);
-                            customization.handle(wordConstruct, index);
+                            if (k < list.size()) {
+                                Customization customization = list.get(k);
+                                newTableCell.getCTTc().setTcPr(ctTcPrList.get(k));
+                                XWPFParagraph newParagraph = getFirstTableParagraph(newTableCell);
+                                newParagraph.getCTP().setPPr(deepCopyPpr);
+                                XWPFRun newRun = newParagraph.createRun();
+                                newRun.getCTR().setRPr(deepCopyRpr);
+                                newRun.setText(customization.getText());
+                                wordConstruct.setRow(newTableRow);
+                                wordConstruct.setCell(newTableCell);
+                                wordConstruct.setParagraph(newParagraph);
+                                wordConstruct.setRun(newRun);
+                                index.setcIndex(k);
+                                index.setpIndex(0);
+                                index.setrIndex(0);
+                                customization.handle(wordConstruct, index);
+                            }
                         }
                         newTableRow.getCtRow().setTrPr(ctTrPr);
-                        ++rowIndex;
                     }
+                    ++rowIndex;
                 }
-                --rowIndex;
-                table.removeRow(temp);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 2019/9/30 18:10
+     * process the vertical label (dynamic label in table) for table
+     *
+     * @param verticalLabel vertical label
+     * @param wordConstruct wordConstruct {@link WordConstruct}
+     * @param index         index{@link Index}
+     * @return true: already processed; false: not processed
+     * @author wangxiaoyu 657518680@qq.com
+     * @since 1.1.0
+     */
+    static boolean processVerticalLabel(Map<String, List<Customization>> verticalLabel,
+                                        WordConstruct wordConstruct,
+                                        Index index) throws IOException, ClassNotFoundException {
+        XWPFTable table = wordConstruct.getTable();
+        XWPFTableRow row = wordConstruct.getRow();
+        XWPFParagraph paragraph = wordConstruct.getParagraph();
+        XWPFRun run = wordConstruct.getRun();
+        int rowIndex = index.getRowIndex();
+        int cellIndex = index.getcIndex();
+        String text = run.text();
+        for (Map.Entry<String, List<Customization>> entry : verticalLabel.entrySet()) {
+            String key = entry.getKey();
+            List<Customization> list = entry.getValue();
+            if (key.equals(text)) {
+                CTTrPr ctTrPr = row.getCtRow().getTrPr();
+                CTPPr ctpPr = paragraph.getCTP().getPPr();
+                CTPPr deepCopyPpr = deepClone((CTPPrImpl)ctpPr);
+                CTRPr ctrPr = run.getCTR().getRPr();
+                CTRPr deepCopyRpr = deepClone((CTRPrImpl)ctrPr);
+                String style = getTrPrString(ctTrPr);
+                List<XWPFTableCell> tableCells = row.getTableCells();
+                List<CTTcPr> ctTcPrList = new ArrayList<>();
+                for (XWPFTableCell temp : tableCells) {
+                    ctTcPrList.add(temp.getCTTc().getTcPr());
+                }
+                for (int i = 0; i < list.size(); i++) {
+                    Customization customization = list.get(i);
+                    if (isTheNextRow(table, rowIndex, style, i)) {
+                        XWPFTableRow tempRow = table.getRow(rowIndex);
+                        XWPFTableCell tempCell = tempRow.getCell(cellIndex);
+                        clearCell(tempCell);
+                        XWPFParagraph tempParagraph = getFirstTableParagraph(tempCell);
+                        tempParagraph.getCTP().setPPr(deepCopyPpr);
+                        XWPFRun tempRun = tempParagraph.createRun();
+                        tempRun.getCTR().setRPr(deepCopyRpr);
+                        tempRun.setText(customization.getText());
+                        wordConstruct.setParagraph(tempParagraph);
+                        wordConstruct.setRun(tempRun);
+                        index.setpIndex(0);
+                        index.setrIndex(0);
+                        customization.handle(wordConstruct, index);
+                    } else {
+                        XWPFTableRow tempRow = table.insertNewTableRow(rowIndex);
+                        for (int k = 0; k < tableCells.size(); k++) {
+                            XWPFTableCell tempCell = tempRow.addNewTableCell();
+                            if (k == cellIndex) {
+                                XWPFParagraph tempParagraph = getFirstTableParagraph(tempCell);
+                                tempParagraph.getCTP().setPPr(deepCopyPpr);
+                                XWPFRun tempRun = tempParagraph.createRun();
+                                tempRun.getCTR().setRPr(deepCopyRpr);
+                                tempRun.setText(customization.getText());
+                                wordConstruct.setRow(tempRow);
+                                wordConstruct.setCell(tempCell);
+                                wordConstruct.setParagraph(tempParagraph);
+                                wordConstruct.setRun(tempRun);
+                                index.setcIndex(k);
+                                index.setpIndex(0);
+                                index.setrIndex(0);
+                                customization.handle(wordConstruct, index);
+                            }
+                        }
+                    }
+                    rowIndex++;
+                }
                 return true;
             }
         }
@@ -215,8 +306,8 @@ final class Processor {
      * @since alpha
      */
     static boolean processPicture4All(Map<String, Customization> pictureLabel,
-                                            WordConstruct wordConstruct,
-                                            Index index) throws IOException, InvalidFormatException {
+                                      WordConstruct wordConstruct,
+                                      Index index) throws IOException, InvalidFormatException {
         XWPFParagraph paragraph = wordConstruct.getParagraph();
         XWPFRun run = wordConstruct.getRun();
         int rIndex = index.getrIndex();
@@ -239,9 +330,17 @@ final class Processor {
         return false;
     }
 
-    static void getXmlns(String head, Map<String, Object> headMap){
+    /**
+     * 2019/9/30 18:11
+     *
+     * @param head    document.xml file header
+     * @param headMap the map of head
+     * @author wangxiaoyu 657518680@qq.com
+     * @since beta
+     */
+    static void getXmlns(String head, Map<String, Object> headMap) {
         Matcher matcher = PATTERN.matcher(head);
-        while (matcher.find()){
+        while (matcher.find()) {
             headMap.put(matcher.group(1), matcher.group());
         }
     }
@@ -349,8 +448,22 @@ final class Processor {
     }
 
     /**
+     * 2019/9/30 18:13
+     * clear all in the cell
+     *
+     * @param tableCell the table cell
+     * @author wangxiaoyu 657518680@qq.com
+     * @since 1.0.0
+     */
+    private static void clearCell(XWPFTableCell tableCell) {
+        for (int i = tableCell.getParagraphs().size() - 1; i >= 0; i--) {
+            tableCell.removeParagraph(i);
+        }
+    }
+
+    /**
      * 2019/8/19
-     * determine if there is a next row that can be used for table label rather than create a new row
+     * determine if the row is the next row that can be used for table label rather than create a new row
      *
      * @param table    table
      * @param rowIndex rowIndex {@link Index#getRowIndex()}
@@ -359,10 +472,9 @@ final class Processor {
      * @author 657518680@qq.com
      * @since alpha
      */
-    private static boolean isHasNextRow(XWPFTable table, int rowIndex, String style, int j) {
-        return table.getRow(rowIndex + 1) != null
-                && style.equals(getTrPrString(table.getRow(rowIndex + 1).getCtRow().getTrPr()))
-                && j != 0;
+    private static boolean isTheNextRow(XWPFTable table, int rowIndex, String style, int j) {
+        return j == 0 || (table.getRow(rowIndex) != null
+                && style.equals(getTrPrString(table.getRow(rowIndex).getCtRow().getTrPr())));
     }
 
     /**
@@ -379,6 +491,26 @@ final class Processor {
             return "";
         }
         return ctTrPr.toString();
+    }
+
+    /**
+     * 2019/9/30 18:55
+     *
+     * @param obj the object need to deep copy
+     * @return the deep copy
+     * @author wangxiaoyu 657518680@qq.com
+     * @since 1.1.0
+     */
+    private static <T extends Serializable> T deepClone(T obj) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream obs = new ObjectOutputStream(out);
+        obs.writeObject(obj);
+        obs.close();
+        ByteArrayInputStream ios = new ByteArrayInputStream(out.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(ios);
+        T cloneObj = (T) ois.readObject();
+        ois.close();
+        return cloneObj;
     }
 
 }

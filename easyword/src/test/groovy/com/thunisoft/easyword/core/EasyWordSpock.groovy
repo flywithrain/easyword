@@ -44,12 +44,19 @@ class EasyWordSpock extends Specification {
         picture.setPicture(this.getClass().getClassLoader().getResourceAsStream("\\file\\zr.jpg"))
         picture.setPictureName('哪吒之魔童降世')
         Map<String, Customization> pictureLabel = ["zr": picture]
+        def verticalLabel = ['vb' : [new DefaultCustomization('1'),
+                                   new DefaultCustomization('2'),
+                                   new DefaultCustomization('3'),
+                                   new DefaultCustomization('4'),
+                                   new DefaultCustomization('5'),
+                                   new DefaultCustomization('6')]]
         EasyWord.replaceLabel(this.getClass().getClassLoader().getResourceAsStream("\\file\\1.docx"),
                 new FileOutputStream(System.getProperty("user.dir") + "\\replace.docx"),
                 staticLabel,
                 dynamicLabel,
                 tableLabel,
-                pictureLabel)
+                pictureLabel,
+                verticalLabel)
 
         expect:
         true
@@ -84,12 +91,14 @@ class EasyWordSpock extends Specification {
         picture.setPicture(this.getClass().getClassLoader().getResourceAsStream("\\file\\zr.jpg"))
         picture.setPictureName('哪吒之魔童降世')
         Map<String, Customization> pictureLabel = ["zr": picture]
+        def verticalLabel = ['vb' : ['1', '2', '3', '4', '5', '6']]
         EasyWord.replaceLabelite(this.getClass().getClassLoader().getResourceAsStream("\\file\\1.docx"),
                 new FileOutputStream(System.getProperty("user.dir") + "\\replacelite.docx"),
                 staticLabelite,
                 dynamicLabelite,
                 tableLabelite,
-                pictureLabel)
+                pictureLabel,
+                verticalLabel)
 
         expect:
         true

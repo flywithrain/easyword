@@ -48,13 +48,13 @@ public final class EasyWord {
     public static void replaceLabelite(@NotNull InputStream inputStream,
                                        @NotNull OutputStream outputStream,
                                        @NotNull Map<String, String> staticLabelite)
-            throws IOException, InvalidFormatException {
+            throws IOException, InvalidFormatException, ClassNotFoundException {
         replaceLabel(inputStream, outputStream, staticLite2Full(staticLabelite));
     }
 
     /**
      * 2019/8/24 14:48
-     * a simplified version of {@link EasyWord#replaceLabel(InputStream, OutputStream, Map, Map, Map, Map)}
+     * a simplified version of {@link EasyWord#replaceLabel(InputStream, OutputStream, Map, Map, Map, Map, Map)}
      *
      * @param inputStream     inputStream
      * @param outputStream    outputStream
@@ -62,6 +62,7 @@ public final class EasyWord {
      * @param dynamicLabelite a simplified version of dynamicLabel
      * @param tableLabelite   a simplified version of tableLabel
      * @param pictureLabel    pictureLabel
+     * @param verticalLabel   verticalLabel
      * @author 657518680@qq.com
      * @since 1.0.0
      */
@@ -70,14 +71,16 @@ public final class EasyWord {
                                        @NotNull Map<String, String> staticLabelite,
                                        @NotNull Map<String, List<String>> dynamicLabelite,
                                        @NotNull Map<String, List<List<String>>> tableLabelite,
-                                       @NotNull Map<String, Customization> pictureLabel)
-            throws IOException, InvalidFormatException {
+                                       @NotNull Map<String, Customization> pictureLabel,
+                                       @NotNull Map<String, List<String>> verticalLabel)
+            throws IOException, InvalidFormatException, ClassNotFoundException {
         replaceLabel(inputStream,
                 outputStream,
                 staticLite2Full(staticLabelite),
                 dynamicLite2Full(dynamicLabelite),
                 tableLite2Full(tableLabelite),
-                pictureLabel);
+                pictureLabel,
+                dynamicLite2Full(verticalLabel));
     }
 
     /**
@@ -95,8 +98,9 @@ public final class EasyWord {
     public static void replaceLabel(@NotNull InputStream inputStream,
                                     @NotNull OutputStream outputStream,
                                     @NotNull Map<String, Customization> staticLabel)
-            throws IOException, InvalidFormatException {
+            throws IOException, InvalidFormatException, ClassNotFoundException {
         replaceLabel(inputStream, outputStream, staticLabel,
+                new HashMap<>(0),
                 new HashMap<>(0),
                 new HashMap<>(0),
                 new HashMap<>(0));
@@ -106,12 +110,13 @@ public final class EasyWord {
      * 2019/8/13
      * replace the label in the word
      *
-     * @param inputStream  inputStream
-     * @param outputStream outputStream
-     * @param staticLabel  staticLabel
-     * @param dynamicLabel dynamicLabel
-     * @param tableLabel   tableLabel
-     * @param pictureLabel pictureLabel
+     * @param inputStream   inputStream
+     * @param outputStream  outputStream
+     * @param staticLabel   staticLabel
+     * @param dynamicLabel  dynamicLabel
+     * @param tableLabel    tableLabel
+     * @param pictureLabel  pictureLabel
+     * @param verticalLabel verticalLabel
      * @throws IOException            IOException
      * @throws InvalidFormatException InvalidFormatException
      * @author 657518680@qq.com
@@ -122,12 +127,13 @@ public final class EasyWord {
                                     @NotNull Map<String, Customization> staticLabel,
                                     @NotNull Map<String, List<Customization>> dynamicLabel,
                                     @NotNull Map<String, List<List<Customization>>> tableLabel,
-                                    @NotNull Map<String, Customization> pictureLabel)
-            throws IOException, InvalidFormatException {
+                                    @NotNull Map<String, Customization> pictureLabel,
+                                    @NotNull Map<String, List<Customization>> verticalLabel)
+            throws IOException, InvalidFormatException, ClassNotFoundException {
         XWPFDocument xwpfDocument = new XWPFDocument(inputStream);
         if (!staticLabel.isEmpty() || !dynamicLabel.isEmpty() || !tableLabel.isEmpty() || !pictureLabel.isEmpty()) {
             processParagraph(xwpfDocument, staticLabel, dynamicLabel, pictureLabel);
-            processTable(xwpfDocument, staticLabel, tableLabel, pictureLabel);
+            processTable(xwpfDocument, staticLabel, tableLabel, pictureLabel, verticalLabel);
         }
         xwpfDocument.write(outputStream);
     }
@@ -245,8 +251,9 @@ public final class EasyWord {
     private static void processTable(@NotNull XWPFDocument xwpfDocument,
                                      Map<String, Customization> staticLabel,
                                      Map<String, List<List<Customization>>> tableLabel,
-                                     Map<String, Customization> pictureLabel)
-            throws IOException, InvalidFormatException {
+                                     Map<String, Customization> pictureLabel,
+                                     Map<String, List<Customization>> verticalLabel)
+            throws IOException, InvalidFormatException, ClassNotFoundException {
         List<XWPFTable> tables = xwpfDocument.getTables();
         for (int t = 0; t < tables.size(); ++t) {
             XWPFTable table = tables.get(t);
@@ -272,6 +279,9 @@ public final class EasyWord {
                             boolean result = false;
                             if (!flag) {
                                 result = Processor.processTable4Table(tableLabel, wordConstruct, index);
+                            }
+                            if (!result) {
+                                result = Processor.processVerticalLabel(verticalLabel, wordConstruct, index);
                             }
                             t = index.getTableIndex();
                             r = index.getRowIndex();
