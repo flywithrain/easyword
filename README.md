@@ -125,3 +125,8 @@ Customization接口中handle方法能够获取到标签回填时刻替换内容�
 -  **1.1.0** 2019-09-30
   - 新增列标签
   - 修复tableLabel标签设置index不正确bug
+- **1.1.1** 2019-10-08 
+  - 修复单独回填列标签失败的bug
+  - 修复gradle项目版本maven无法识别bug
+  - 修复多列回填rowIndex不正确bug
+
