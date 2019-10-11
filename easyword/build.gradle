@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.thunisoft'
-version = '1.1.0'
+version = '1.1.1'
 sourceCompatibility = '1.8'
 def poiVersion = '4.1.0'
 
@@ -19,6 +19,9 @@ repositories {
     maven {
         url 'http://maven.aliyun.com/nexus/content/groups/public'
     }
+    maven {
+        url 'https://mvnrepository.com'
+    }
     mavenCentral()
 }
 
@@ -30,8 +33,8 @@ dependencies {
     compile "org.apache.poi:poi-excelant:${poiVersion}"
     compile "org.apache.poi:poi-ooxml-schemas:${poiVersion}"
     compile "org.apache.poi:poi-scratchpad:${poiVersion}"
+    compile "org.apache.poi:ooxml-schemas:1.4"
     compile 'org.jetbrains:annotations:latest.release'
-    compile 'org.apache.poi:ooxml-schemas:+'
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.3-groovy-2.5'
 }
 

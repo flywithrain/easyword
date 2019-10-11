@@ -232,6 +232,7 @@ final class Processor {
         XWPFParagraph paragraph = wordConstruct.getParagraph();
         XWPFRun run = wordConstruct.getRun();
         int rowIndex = index.getRowIndex();
+        int originalRowIndex = rowIndex;
         int cellIndex = index.getcIndex();
         String text = run.text();
         for (Map.Entry<String, List<Customization>> entry : verticalLabel.entrySet()) {
@@ -262,6 +263,7 @@ final class Processor {
                         tempRun.setText(customization.getText());
                         wordConstruct.setParagraph(tempParagraph);
                         wordConstruct.setRun(tempRun);
+                        index.setRowIndex(rowIndex);
                         index.setpIndex(0);
                         index.setrIndex(0);
                         customization.handle(wordConstruct, index);
@@ -279,7 +281,7 @@ final class Processor {
                                 wordConstruct.setCell(tempCell);
                                 wordConstruct.setParagraph(tempParagraph);
                                 wordConstruct.setRun(tempRun);
-                                index.setcIndex(k);
+                                index.setRowIndex(rowIndex);
                                 index.setpIndex(0);
                                 index.setrIndex(0);
                                 customization.handle(wordConstruct, index);
@@ -288,6 +290,7 @@ final class Processor {
                     }
                     rowIndex++;
                 }
+                index.setRowIndex(--originalRowIndex);
                 return true;
             }
         }

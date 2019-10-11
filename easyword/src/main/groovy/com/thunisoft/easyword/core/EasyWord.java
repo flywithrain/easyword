@@ -131,7 +131,8 @@ public final class EasyWord {
                                     @NotNull Map<String, List<Customization>> verticalLabel)
             throws IOException, InvalidFormatException, ClassNotFoundException {
         XWPFDocument xwpfDocument = new XWPFDocument(inputStream);
-        if (!staticLabel.isEmpty() || !dynamicLabel.isEmpty() || !tableLabel.isEmpty() || !pictureLabel.isEmpty()) {
+        if (!staticLabel.isEmpty() || !dynamicLabel.isEmpty() || !tableLabel.isEmpty()
+                || !pictureLabel.isEmpty() || !verticalLabel.isEmpty()) {
             processParagraph(xwpfDocument, staticLabel, dynamicLabel, pictureLabel);
             processTable(xwpfDocument, staticLabel, tableLabel, pictureLabel, verticalLabel);
         }
