@@ -244,6 +244,7 @@ final class Processor {
                 CTPPr deepCopyPpr = deepClone((CTPPrImpl)ctpPr);
                 CTRPr ctrPr = run.getCTR().getRPr();
                 CTRPr deepCopyRpr = deepClone((CTRPrImpl)ctrPr);
+                processVanish(deepCopyRpr);
                 String style = getTrPrString(ctTrPr);
                 List<XWPFTableCell> tableCells = row.getTableCells();
                 List<CTTcPr> ctTcPrList = new ArrayList<>();
@@ -271,6 +272,7 @@ final class Processor {
                         XWPFTableRow tempRow = table.insertNewTableRow(rowIndex);
                         for (int k = 0; k < tableCells.size(); k++) {
                             XWPFTableCell tempCell = tempRow.addNewTableCell();
+                            tempCell.getCTTc().setTcPr(ctTcPrList.get(k));
                             if (k == cellIndex) {
                                 XWPFParagraph tempParagraph = getFirstTableParagraph(tempCell);
                                 tempParagraph.getCTP().setPPr(deepCopyPpr);
