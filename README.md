@@ -129,4 +129,6 @@ Customization接口中handle方法能够获取到标签回填时刻替换内容�
   - 修复单独回填列标签失败的bug
   - 修复gradle项目版本maven无法识别bug
   - 修复多列回填rowIndex不正确bug
-
+- **1.1.2** 2019-10-12
+  - 修复列标签不支持隐藏标签的bug
+  - 修复列标签新建cell格式未参照标签行的bug
