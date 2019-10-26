@@ -1,6 +1,7 @@
 package com.thunisoft.easyword.core;
 
-import com.thunisoft.easyword.bo.Customization;
+import com.thunisoft.easyword.bo.Customization4Picture;
+import com.thunisoft.easyword.bo.Customization4Text;
 import com.thunisoft.easyword.bo.Index;
 import com.thunisoft.easyword.bo.WordConstruct;
 import com.thunisoft.easyword.util.AnalyzeFileType;
@@ -56,15 +57,15 @@ final class Processor {
      * @author 657518680@qq.com
      * @since alpha
      */
-    static boolean processStaticLabel(Map<String, Customization> staticLabel,
+    static boolean processStaticLabel(Map<String, Customization4Text> staticLabel,
                                       WordConstruct wordConstruct,
                                       Index index) {
         XWPFRun run = wordConstruct.getRun();
         XWPFParagraph paragraph = wordConstruct.getParagraph();
         String text = run.text();
-        for (Map.Entry<String, Customization> entry : staticLabel.entrySet()) {
+        for (Map.Entry<String, Customization4Text> entry : staticLabel.entrySet()) {
             int rIndex = index.getrIndex();
-            Customization customization = entry.getValue();
+            Customization4Text customization = entry.getValue();
             String key = entry.getKey();
             if (key.equals(text.trim())) {
                 XWPFRun newRun = paragraph.insertNewRun(rIndex);
@@ -94,17 +95,17 @@ final class Processor {
      * @since alpha
      */
     static boolean processDynamicLabel4Paragraph(XWPFDocument xwpfDocument,
-                                                 Map<String, List<Customization>> dynamicLabel,
+                                                 Map<String, List<Customization4Text>> dynamicLabel,
                                                  WordConstruct wordConstruct,
                                                  Index index) {
         XWPFRun run = wordConstruct.getRun();
         XWPFParagraph paragraph = wordConstruct.getParagraph();
         String text = run.text();
-        for (Map.Entry<String, List<Customization>> entry : dynamicLabel.entrySet()) {
-            List<Customization> customizationList = entry.getValue();
+        for (Map.Entry<String, List<Customization4Text>> entry : dynamicLabel.entrySet()) {
+            List<Customization4Text> customizationList = entry.getValue();
             String key = entry.getKey();
             if (key.equals(text.trim())) {
-                for (Customization customization : customizationList) {
+                for (Customization4Text customization : customizationList) {
                     XmlCursor cursor = paragraph.getCTP().newCursor();
                     XWPFParagraph newPara = xwpfDocument.insertNewParagraph(cursor);
                     newPara.getCTP().setPPr(paragraph.getCTP().getPPr());
@@ -135,7 +136,7 @@ final class Processor {
      * @author 657518680@qq.com
      * @since alpha
      */
-    static boolean processTable4Table(Map<String, List<List<Customization>>> tableLabel,
+    static boolean processTable4Table(Map<String, List<List<Customization4Text>>> tableLabel,
                                       WordConstruct wordConstruct,
                                       Index index) throws IOException, ClassNotFoundException {
         XWPFTable table = wordConstruct.getTable();
@@ -144,9 +145,9 @@ final class Processor {
         XWPFRun run = wordConstruct.getRun();
         int rowIndex = index.getRowIndex();
         String text = run.text();
-        for (Map.Entry<String, List<List<Customization>>> entry : tableLabel.entrySet()) {
+        for (Map.Entry<String, List<List<Customization4Text>>> entry : tableLabel.entrySet()) {
             String key = entry.getKey();
-            List<List<Customization>> listList = entry.getValue();
+            List<List<Customization4Text>> listList = entry.getValue();
             if (key.equals(text)) {
                 CTTrPr ctTrPr = row.getCtRow().getTrPr();
                 CTPPr ctpPr = paragraph.getCTP().getPPr();
@@ -158,7 +159,7 @@ final class Processor {
                     ctTcPrList.add(temp.getCTTc().getTcPr());
                 }
                 for (int j = 0; j < listList.size(); j++) {
-                    List<Customization> list = listList.get(j);
+                    List<Customization4Text> list = listList.get(j);
                     CTRPr deepCopyRpr = null;
                     if(j == 0){
                         CTRPr ctrPr = run.getCTR().getRPr();
@@ -167,7 +168,7 @@ final class Processor {
                     if (isTheNextRow(table, rowIndex, style, j)) {
                         XWPFTableRow newTableRow = table.getRow(rowIndex);
                         for (int k = 0; k < list.size(); k++) {
-                            Customization customization = list.get(k);
+                            Customization4Text customization = list.get(k);
                             XWPFTableCell tableCell = newTableRow.getCell(k);
                             clearCell(tableCell);
                             XWPFParagraph xwpfParagraph = getFirstTableParagraph(tableCell);
@@ -186,7 +187,7 @@ final class Processor {
                         for (int k = 0; k < tableCells.size(); k++) {
                             XWPFTableCell newTableCell = newTableRow.addNewTableCell();
                             if (k < list.size()) {
-                                Customization customization = list.get(k);
+                                Customization4Text customization = list.get(k);
                                 newTableCell.getCTTc().setTcPr(ctTcPrList.get(k));
                                 XWPFParagraph newParagraph = getFirstTableParagraph(newTableCell);
                                 newParagraph.getCTP().setPPr(deepCopyPpr);
@@ -224,7 +225,7 @@ final class Processor {
      * @author wangxiaoyu 657518680@qq.com
      * @since 1.1.0
      */
-    static boolean processVerticalLabel(Map<String, List<Customization>> verticalLabel,
+    static boolean processVerticalLabel(Map<String, List<Customization4Text>> verticalLabel,
                                         WordConstruct wordConstruct,
                                         Index index) throws IOException, ClassNotFoundException {
         XWPFTable table = wordConstruct.getTable();
@@ -235,9 +236,9 @@ final class Processor {
         int originalRowIndex = rowIndex;
         int cellIndex = index.getcIndex();
         String text = run.text();
-        for (Map.Entry<String, List<Customization>> entry : verticalLabel.entrySet()) {
+        for (Map.Entry<String, List<Customization4Text>> entry : verticalLabel.entrySet()) {
             String key = entry.getKey();
-            List<Customization> list = entry.getValue();
+            List<Customization4Text> list = entry.getValue();
             if (key.equals(text)) {
                 CTTrPr ctTrPr = row.getCtRow().getTrPr();
                 CTPPr ctpPr = paragraph.getCTP().getPPr();
@@ -252,7 +253,7 @@ final class Processor {
                     ctTcPrList.add(temp.getCTTc().getTcPr());
                 }
                 for (int i = 0; i < list.size(); i++) {
-                    Customization customization = list.get(i);
+                    Customization4Text customization = list.get(i);
                     if (isTheNextRow(table, rowIndex, style, i)) {
                         XWPFTableRow tempRow = table.getRow(rowIndex);
                         XWPFTableCell tempCell = tempRow.getCell(cellIndex);
@@ -310,15 +311,15 @@ final class Processor {
      * @author 657518680@qq.com
      * @since alpha
      */
-    static boolean processPicture4All(Map<String, Customization> pictureLabel,
+    static boolean processPicture4All(Map<String, Customization4Picture> pictureLabel,
                                       WordConstruct wordConstruct,
                                       Index index) throws IOException, InvalidFormatException {
         XWPFParagraph paragraph = wordConstruct.getParagraph();
         XWPFRun run = wordConstruct.getRun();
         int rIndex = index.getrIndex();
         String text = run.text();
-        for (Map.Entry<String, Customization> entry : pictureLabel.entrySet()) {
-            Customization customization = entry.getValue();
+        for (Map.Entry<String, Customization4Picture> entry : pictureLabel.entrySet()) {
+            Customization4Picture customization = entry.getValue();
             String key = entry.getKey();
             if (key.equals(text)) {
                 XWPFRun newRun = paragraph.insertNewRun(rIndex);
@@ -358,7 +359,7 @@ final class Processor {
      * @author 657518680@qq.com
      * @since beta
      */
-    private static void processPicture(Customization customization,
+    private static void processPicture(Customization4Picture customization,
                                        XWPFRun newRun) throws IOException, InvalidFormatException {
         byte[] bytes = IOUtils.toByteArray(customization.getPicture());
         int width = customization.getWidth();

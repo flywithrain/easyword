@@ -1,9 +1,6 @@
 package com.thunisoft.easyword.core;
 
-import com.thunisoft.easyword.bo.Customization;
-import com.thunisoft.easyword.bo.DefaultCustomization;
-import com.thunisoft.easyword.bo.Index;
-import com.thunisoft.easyword.bo.WordConstruct;
+import com.thunisoft.easyword.bo.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xwpf.usermodel.*;
@@ -71,7 +68,7 @@ public final class EasyWord {
                                        @NotNull Map<String, String> staticLabelite,
                                        @NotNull Map<String, List<String>> dynamicLabelite,
                                        @NotNull Map<String, List<List<String>>> tableLabelite,
-                                       @NotNull Map<String, Customization> pictureLabel,
+                                       @NotNull Map<String, Customization4Picture> pictureLabel,
                                        @NotNull Map<String, List<String>> verticalLabel)
             throws IOException, InvalidFormatException, ClassNotFoundException {
         replaceLabel(inputStream,
@@ -97,7 +94,7 @@ public final class EasyWord {
      */
     public static void replaceLabel(@NotNull InputStream inputStream,
                                     @NotNull OutputStream outputStream,
-                                    @NotNull Map<String, Customization> staticLabel)
+                                    @NotNull Map<String, Customization4Text> staticLabel)
             throws IOException, InvalidFormatException, ClassNotFoundException {
         replaceLabel(inputStream, outputStream, staticLabel,
                 new HashMap<>(0),
@@ -124,11 +121,11 @@ public final class EasyWord {
      */
     public static void replaceLabel(@NotNull InputStream inputStream,
                                     @NotNull OutputStream outputStream,
-                                    @NotNull Map<String, Customization> staticLabel,
-                                    @NotNull Map<String, List<Customization>> dynamicLabel,
-                                    @NotNull Map<String, List<List<Customization>>> tableLabel,
-                                    @NotNull Map<String, Customization> pictureLabel,
-                                    @NotNull Map<String, List<Customization>> verticalLabel)
+                                    @NotNull Map<String, Customization4Text> staticLabel,
+                                    @NotNull Map<String, List<Customization4Text>> dynamicLabel,
+                                    @NotNull Map<String, List<List<Customization4Text>>> tableLabel,
+                                    @NotNull Map<String, Customization4Picture> pictureLabel,
+                                    @NotNull Map<String, List<Customization4Text>> verticalLabel)
             throws IOException, InvalidFormatException, ClassNotFoundException {
         XWPFDocument xwpfDocument = new XWPFDocument(inputStream);
         if (!staticLabel.isEmpty() || !dynamicLabel.isEmpty() || !tableLabel.isEmpty()
@@ -207,9 +204,9 @@ public final class EasyWord {
      * @since alpha
      */
     private static void processParagraph(@NotNull XWPFDocument xwpfDocument,
-                                         Map<String, Customization> staticLabel,
-                                         Map<String, List<Customization>> dynamicLabel,
-                                         Map<String, Customization> pictureLabel)
+                                         Map<String, Customization4Text> staticLabel,
+                                         Map<String, List<Customization4Text>> dynamicLabel,
+                                         Map<String, Customization4Picture> pictureLabel)
             throws IOException, InvalidFormatException {
         List<XWPFParagraph> paragraphs = xwpfDocument.getParagraphs();
         pLable:
@@ -250,10 +247,10 @@ public final class EasyWord {
      * @since alpha
      */
     private static void processTable(@NotNull XWPFDocument xwpfDocument,
-                                     Map<String, Customization> staticLabel,
-                                     Map<String, List<List<Customization>>> tableLabel,
-                                     Map<String, Customization> pictureLabel,
-                                     Map<String, List<Customization>> verticalLabel)
+                                     Map<String, Customization4Text> staticLabel,
+                                     Map<String, List<List<Customization4Text>>> tableLabel,
+                                     Map<String, Customization4Picture> pictureLabel,
+                                     Map<String, List<Customization4Text>> verticalLabel)
             throws IOException, InvalidFormatException, ClassNotFoundException {
         List<XWPFTable> tables = xwpfDocument.getTables();
         for (int t = 0; t < tables.size(); ++t) {
@@ -308,8 +305,8 @@ public final class EasyWord {
      * @author 657518680@qq.com
      * @since 1.0.0
      */
-    private static Map<String, Customization> staticLite2Full(Map<String, String> staticLabelite) {
-        Map<String, Customization> staticLabel = new HashMap<>(staticLabelite.size());
+    public static Map<String, Customization4Text> staticLite2Full(Map<String, String> staticLabelite) {
+        Map<String, Customization4Text> staticLabel = new HashMap<>(staticLabelite.size());
         for (Map.Entry<String, String> entry : staticLabelite.entrySet()) {
             staticLabel.put(entry.getKey(), new DefaultCustomization(entry.getValue()));
         }
@@ -325,10 +322,10 @@ public final class EasyWord {
      * @author 657518680@qq.com
      * @since 1.0.0
      */
-    private static Map<String, List<Customization>> dynamicLite2Full(Map<String, List<String>> dynamicLabelite) {
-        Map<String, List<Customization>> dynamicLabel = new HashMap<>(dynamicLabelite.size());
+    public static Map<String, List<Customization4Text>> dynamicLite2Full(Map<String, List<String>> dynamicLabelite) {
+        Map<String, List<Customization4Text>> dynamicLabel = new HashMap<>(dynamicLabelite.size());
         for (Map.Entry<String, List<String>> entry : dynamicLabelite.entrySet()) {
-            List<Customization> temp = new ArrayList<>(entry.getValue().size());
+            List<Customization4Text> temp = new ArrayList<>(entry.getValue().size());
             entry.getValue().forEach(str -> temp.add(new DefaultCustomization(str)));
             dynamicLabel.put(entry.getKey(), temp);
         }
@@ -344,13 +341,13 @@ public final class EasyWord {
      * @author 657518680@qq.com
      * @since 1.0.0
      */
-    private static Map<String, List<List<Customization>>>
+    public static Map<String, List<List<Customization4Text>>>
     tableLite2Full(Map<String, List<List<String>>> tableLabelite) {
-        Map<String, List<List<Customization>>> tableLabel = new HashMap<>(tableLabelite.size());
+        Map<String, List<List<Customization4Text>>> tableLabel = new HashMap<>(tableLabelite.size());
         for (Map.Entry<String, List<List<String>>> entry : tableLabelite.entrySet()) {
-            List<List<Customization>> rows = new ArrayList<>(entry.getValue().size());
+            List<List<Customization4Text>> rows = new ArrayList<>(entry.getValue().size());
             entry.getValue().forEach((List<String> list) -> {
-                List<Customization> row = new ArrayList<>(list.size());
+                List<Customization4Text> row = new ArrayList<>(list.size());
                 list.forEach(str -> row.add(new DefaultCustomization(str)));
                 rows.add(row);
             });
