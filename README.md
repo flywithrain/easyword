@@ -134,3 +134,5 @@ Customization接口中handle方法能够获取到标签回填时刻替换内容�
   - 修复列标签新建cell格式未参照标签行的bug
 - **1.1.3** 2019-10-26 
   - 拆分Customization接口为Customization4Text和Customization4Picture
+  - 修复processTable4Table回填run样式未回填bug
+  - 开放包括staticLite2Full、dynamicLite2Full、tableLite2Full接口
