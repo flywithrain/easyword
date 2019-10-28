@@ -158,9 +158,9 @@ final class Processor {
                 for (XWPFTableCell temp : tableCells) {
                     ctTcPrList.add(temp.getCTTc().getTcPr());
                 }
+                CTRPr deepCopyRpr = null;
                 for (int j = 0; j < listList.size(); j++) {
                     List<Customization4Text> list = listList.get(j);
-                    CTRPr deepCopyRpr = null;
                     if(j == 0){
                         CTRPr ctrPr = run.getCTR().getRPr();
                         deepCopyRpr = deepClone((CTRPrImpl)ctrPr);

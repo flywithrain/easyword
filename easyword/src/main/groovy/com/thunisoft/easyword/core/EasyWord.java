@@ -278,7 +278,7 @@ public final class EasyWord {
                             if (!flag) {
                                 result = Processor.processTable4Table(tableLabel, wordConstruct, index);
                             }
-                            if (!result) {
+                            if (!flag && !result) {
                                 result = Processor.processVerticalLabel(verticalLabel, wordConstruct, index);
                             }
                             t = index.getTableIndex();
