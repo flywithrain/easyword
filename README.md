@@ -136,3 +136,5 @@ Customization接口中handle方法能够获取到标签回填时刻替换内容�
   - 拆分Customization接口为Customization4Text和Customization4Picture
   - 修复processTable4Table回填run样式未回填bug
   - 开放包括staticLite2Full、dynamicLite2Full、tableLite2Full接口
+- **1.1.4** 2019-10-29 
+  - replaceAll() -> replace() 去除正则替换
