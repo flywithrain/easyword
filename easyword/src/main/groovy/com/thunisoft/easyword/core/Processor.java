@@ -73,7 +73,7 @@ final class Processor {
                 processVanish(ctrPr);
                 newRun.getCTR().setRPr(ctrPr);
                 paragraph.removeRun(rIndex + 1);
-                newRun.setText(text.replaceAll(key, customization.getText()));
+                newRun.setText(text.replace(key, customization.getText()));
                 wordConstruct.setRun(newRun);
                 customization.handle(wordConstruct, index);
                 return true;
