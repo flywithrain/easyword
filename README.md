@@ -109,32 +109,45 @@ Customization接口中handle方法能够获取到标签回填时刻替换内容�
 
 ## 版本
 
-- **Aplha** 2019-08-19
-	* 从项目中抽离代码，初始化项目；
-	* 增加单元测试，修复部分bug；
-- **Beta** 2019-08-23
-	* 完善隐藏标签替换功能；
-	* 新增word合并功能；
-	* 修复所有已知bug；
-- **1.0.0** 2019-08-24
-	* 新增replaceLabelite方法，简化替换操作
-	* 修复Customization设置WordConstruct不正确bug
-- **1.0.1** 2019-09-20
-  - 修复pom引用文件中类型\<type\>缺失bug
-  - 修复表格回填图片清空cell导致index出错bug
-- **1.1.0** 2019-09-30
-  - 新增列标签
-  - 修复tableLabel标签设置index不正确bug
-- **1.1.1** 2019-10-08 
-  - 修复单独回填列标签失败的bug
-  - 修复gradle项目版本maven无法识别bug
-  - 修复多列回填rowIndex不正确bug
-- **1.1.2** 2019-10-12
-  - 修复列标签不支持隐藏标签的bug
-  - 修复列标签新建cell格式未参照标签行的bug
-- **1.1.3** 2019-10-26 
-  - 拆分Customization接口为Customization4Text和Customization4Picture
-  - 修复processTable4Table回填run样式未回填bug
-  - 开放包括staticLite2Full、dynamicLite2Full、tableLite2Full接口
-- **1.1.4** 2019-10-29 
-  - replaceAll() -> replace() 去除正则替换
+**Aplha** 2019-08-19
+* 从项目中抽离代码，初始化项目；
+* 增加单元测试，修复部分bug；
+
+**Beta** 2019-08-23
+* 完善隐藏标签替换功能；
+* 新增word合并功能；
+* 修复所有已知bug；
+
+**1.0.0** 2019-08-24
+* 新增replaceLabelite方法，简化替换操作
+* 修复Customization设置WordConstruct不正确bug
+
+**1.0.1** 2019-09-20
+- 修复pom引用文件中类型\<type\>缺失bug
+- 修复表格回填图片清空cell导致index出错bug
+
+**1.1.0** 2019-09-30
+- 新增列标签
+- 修复tableLabel标签设置index不正确bug
+
+**1.1.1** 2019-10-08 
+- 修复单独回填列标签失败的bug
+- 修复gradle项目版本maven无法识别bug
+- 修复多列回填rowIndex不正确bug
+
+**1.1.2** 2019-10-12
+- 修复列标签不支持隐藏标签的bug
+- 修复列标签新建cell格式未参照标签行的bug
+
+**1.1.3** 2019-10-26 
+- 拆分Customization接口为Customization4Text和Customization4Picture
+- 修复processTable4Table回填run样式未回填bug
+- 开放包括staticLite2Full、dynamicLite2Full、tableLite2Full接口
+
+**1.1.4** 2019-10-29 
+
+- replaceAll() -> replace() 去除正则替换
+
+**1.1.5** 2019-11-22
+
+- 修复processDynamicLabel4Paragraph处理后段落索引未去除标签段落导致遍历word时丢失对processDynamicLabel4Paragraph处理段落的后一段落的遍历bug
