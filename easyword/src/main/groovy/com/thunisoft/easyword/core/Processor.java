@@ -101,11 +101,13 @@ final class Processor {
         XWPFRun run = wordConstruct.getRun();
         XWPFParagraph paragraph = wordConstruct.getParagraph();
         String text = run.text();
+        int pIndex = index.getpIndex();
         for (Map.Entry<String, List<Customization4Text>> entry : dynamicLabel.entrySet()) {
             List<Customization4Text> customizationList = entry.getValue();
             String key = entry.getKey();
             if (key.equals(text.trim())) {
-                for (Customization4Text customization : customizationList) {
+                for (int i = 0; i < customizationList.size(); i++) {
+                    Customization4Text customization = customizationList.get(i);
                     XmlCursor cursor = paragraph.getCTP().newCursor();
                     XWPFParagraph newPara = xwpfDocument.insertNewParagraph(cursor);
                     newPara.getCTP().setPPr(paragraph.getCTP().getPPr());
@@ -113,12 +115,15 @@ final class Processor {
                     newRun.getCTR().setRPr(run.getCTR().getRPr());
                     newRun.setText(customization.getText());
                     wordConstruct.setRun(newRun);
+                    wordConstruct.setParagraph(newPara);
+                    index.setrIndex(0);
+                    index.setpIndex(pIndex + i);
                     customization.handle(wordConstruct, index);
                 }
                 xwpfDocument.removeBodyElement(xwpfDocument.getPosOfParagraph(paragraph));
-                int pIndex = index.getpIndex();
-                pIndex += customizationList.size();
-                index.setpIndex(pIndex);
+                if(customizationList.isEmpty()){
+                    index.setpIndex(pIndex - 1);
+                }
                 return true;
             }
         }
