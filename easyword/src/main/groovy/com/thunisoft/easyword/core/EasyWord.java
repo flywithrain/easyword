@@ -1,6 +1,8 @@
 package com.thunisoft.easyword.core;
 
-import com.thunisoft.easyword.bo.*;
+import com.thunisoft.easyword.bo.Customization;
+import com.thunisoft.easyword.bo.Index;
+import com.thunisoft.easyword.bo.WordConstruct;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xwpf.usermodel.*;
@@ -11,7 +13,6 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,105 +34,23 @@ public final class EasyWord {
     }
 
     /**
-     * 2019/8/24 14:58
-     * a simplified version of {@link EasyWord#replaceLabel(InputStream, OutputStream, Map)}
-     *
-     * @param inputStream    inputStream
-     * @param outputStream   outputStream
-     * @param staticLabelite a simplified version of staticLabel
-     * @author 657518680@qq.com
-     * @since 1.0.0
-     */
-    public static void replaceLabelite(@NotNull InputStream inputStream,
-                                       @NotNull OutputStream outputStream,
-                                       @NotNull Map<String, String> staticLabelite)
-            throws IOException, InvalidFormatException, ClassNotFoundException {
-        replaceLabel(inputStream, outputStream, staticLite2Full(staticLabelite));
-    }
-
-    /**
-     * 2019/8/24 14:48
-     * a simplified version of {@link EasyWord#replaceLabel(InputStream, OutputStream, Map, Map, Map, Map, Map)}
-     *
-     * @param inputStream     inputStream
-     * @param outputStream    outputStream
-     * @param staticLabelite  a simplified version of staticLabel
-     * @param dynamicLabelite a simplified version of dynamicLabel
-     * @param tableLabelite   a simplified version of tableLabel
-     * @param pictureLabel    pictureLabel
-     * @param verticalLabel   verticalLabel
-     * @author 657518680@qq.com
-     * @since 1.0.0
-     */
-    public static void replaceLabelite(@NotNull InputStream inputStream,
-                                       @NotNull OutputStream outputStream,
-                                       @NotNull Map<String, String> staticLabelite,
-                                       @NotNull Map<String, List<String>> dynamicLabelite,
-                                       @NotNull Map<String, List<List<String>>> tableLabelite,
-                                       @NotNull Map<String, Customization4Picture> pictureLabel,
-                                       @NotNull Map<String, List<String>> verticalLabel)
-            throws IOException, InvalidFormatException, ClassNotFoundException {
-        replaceLabel(inputStream,
-                outputStream,
-                staticLite2Full(staticLabelite),
-                dynamicLite2Full(dynamicLabelite),
-                tableLite2Full(tableLabelite),
-                pictureLabel,
-                dynamicLite2Full(verticalLabel));
-    }
-
-    /**
-     * 2019/8/19
+     * 2019/8/13
      * replace the label in the word
      *
      * @param inputStream  inputStream
      * @param outputStream outputStream
-     * @param staticLabel  staticLabel
-     * @throws IOException            IOException
-     * @throws InvalidFormatException InvalidFormatException
+     * @param label        label
+     * @throws IOException IOException
      * @author 657518680@qq.com
      * @since alpha
      */
     public static void replaceLabel(@NotNull InputStream inputStream,
                                     @NotNull OutputStream outputStream,
-                                    @NotNull Map<String, Customization4Text> staticLabel)
-            throws IOException, InvalidFormatException, ClassNotFoundException {
-        replaceLabel(inputStream, outputStream, staticLabel,
-                new HashMap<>(0),
-                new HashMap<>(0),
-                new HashMap<>(0),
-                new HashMap<>(0));
-    }
-
-    /**
-     * 2019/8/13
-     * replace the label in the word
-     *
-     * @param inputStream   inputStream
-     * @param outputStream  outputStream
-     * @param staticLabel   staticLabel
-     * @param dynamicLabel  dynamicLabel
-     * @param tableLabel    tableLabel
-     * @param pictureLabel  pictureLabel
-     * @param verticalLabel verticalLabel
-     * @throws IOException            IOException
-     * @throws InvalidFormatException InvalidFormatException
-     * @author 657518680@qq.com
-     * @since alpha
-     */
-    public static void replaceLabel(@NotNull InputStream inputStream,
-                                    @NotNull OutputStream outputStream,
-                                    @NotNull Map<String, Customization4Text> staticLabel,
-                                    @NotNull Map<String, List<Customization4Text>> dynamicLabel,
-                                    @NotNull Map<String, List<List<Customization4Text>>> tableLabel,
-                                    @NotNull Map<String, Customization4Picture> pictureLabel,
-                                    @NotNull Map<String, List<Customization4Text>> verticalLabel)
-            throws IOException, InvalidFormatException, ClassNotFoundException {
+                                    @NotNull Map<String, Customization> label) throws IOException {
         XWPFDocument xwpfDocument = new XWPFDocument(inputStream);
-        if (!staticLabel.isEmpty() || !dynamicLabel.isEmpty() || !tableLabel.isEmpty()
-                || !pictureLabel.isEmpty() || !verticalLabel.isEmpty()) {
-            processParagraph(xwpfDocument, staticLabel, dynamicLabel, pictureLabel);
-            processTable(xwpfDocument, staticLabel, tableLabel, pictureLabel, verticalLabel);
+        if (!label.isEmpty()) {
+            processParagraph(xwpfDocument, label);
+            processTable(xwpfDocument, label);
         }
         xwpfDocument.write(outputStream);
     }
@@ -180,7 +99,7 @@ public final class EasyWord {
             }
         }
         StringBuilder prefix = new StringBuilder(HEAD);
-        for (Map.Entry xmlns : headMap.entrySet()) {
+        for (Map.Entry<String, Object> xmlns : headMap.entrySet()) {
             prefix.append(xmlns.getValue());
         }
         prefix.append(">");
@@ -197,39 +116,22 @@ public final class EasyWord {
      * description
      *
      * @param xwpfDocument xwpfDocument
-     * @param staticLabel  staticLabel
-     * @param dynamicLabel dynamicLabel
-     * @param pictureLabel pictureLabel
+     * @param label        staticLabel
      * @author 657518680@qq.com
      * @since alpha
      */
-    private static void processParagraph(@NotNull XWPFDocument xwpfDocument,
-                                         Map<String, Customization4Text> staticLabel,
-                                         Map<String, List<Customization4Text>> dynamicLabel,
-                                         Map<String, Customization4Picture> pictureLabel)
-            throws IOException, InvalidFormatException {
+    private static void processParagraph(@NotNull XWPFDocument xwpfDocument, Map<String, Customization> label) {
         List<XWPFParagraph> paragraphs = xwpfDocument.getParagraphs();
-        pLable:
         for (int p = 0; p < paragraphs.size(); ++p) {
             XWPFParagraph paragraph = paragraphs.get(p);
             List<XWPFRun> runs = paragraph.getRuns();
             for (int r = 0; r < runs.size(); ++r) {
                 XWPFRun run = runs.get(r);
                 Index index = new Index(p, r);
-                WordConstruct wordConstruct = new WordConstruct(paragraph, run);
-                //是否已经处理过run
-                boolean flag = Processor.processStaticLabel(staticLabel, wordConstruct, index);
-                if (!flag) {
-                    flag = Processor.processPicture4All(pictureLabel, wordConstruct, index);
-                }
-                boolean result = false;
-                if (!flag) {
-                    result = Processor.processDynamicLabel4Paragraph(xwpfDocument, dynamicLabel, wordConstruct, index);
-                }
-                p = index.getpIndex();
-                r = index.getrIndex();
-                if (result) {
-                    continue pLable;
+                WordConstruct wordConstruct = new WordConstruct(xwpfDocument, paragraph, run);
+                if (Processor.processLabel(label, wordConstruct, index)) {
+                    p = index.getpIndex();
+                    r = index.getrIndex();
                 }
             }
         }
@@ -240,23 +142,15 @@ public final class EasyWord {
      * description
      *
      * @param xwpfDocument xwpfDocument
-     * @param staticLabel  staticLabel
-     * @param tableLabel   tableLabel
-     * @param pictureLabel pictureLabel
+     * @param label        label
      * @author 657518680@qq.com
      * @since alpha
      */
-    private static void processTable(@NotNull XWPFDocument xwpfDocument,
-                                     Map<String, Customization4Text> staticLabel,
-                                     Map<String, List<List<Customization4Text>>> tableLabel,
-                                     Map<String, Customization4Picture> pictureLabel,
-                                     Map<String, List<Customization4Text>> verticalLabel)
-            throws IOException, InvalidFormatException, ClassNotFoundException {
+    private static void processTable(@NotNull XWPFDocument xwpfDocument, Map<String, Customization> label) {
         List<XWPFTable> tables = xwpfDocument.getTables();
         for (int t = 0; t < tables.size(); ++t) {
             XWPFTable table = tables.get(t);
             List<XWPFTableRow> rows = table.getRows();
-            rlabel:
             for (int r = 0; r < rows.size(); ++r) {
                 XWPFTableRow row = rows.get(r);
                 List<XWPFTableCell> cells = row.getTableCells();
@@ -269,91 +163,20 @@ public final class EasyWord {
                         for (int i = 0; i < runs.size(); ++i) {
                             XWPFRun run = runs.get(i);
                             Index index = new Index(t, r, c, p, i);
-                            WordConstruct wordConstruct = new WordConstruct(table, row, cell, paragraph, run);
-                            boolean flag = Processor.processStaticLabel(staticLabel, wordConstruct, index);
-                            if (!flag) {
-                                flag = Processor.processPicture4All(pictureLabel, wordConstruct, index);
-                            }
-                            boolean result = false;
-                            if (!flag) {
-                                result = Processor.processTable4Table(tableLabel, wordConstruct, index);
-                            }
-                            if (!flag && !result) {
-                                result = Processor.processVerticalLabel(verticalLabel, wordConstruct, index);
-                            }
-                            t = index.getTableIndex();
-                            r = index.getRowIndex();
-                            c = index.getcIndex();
-                            p = index.getpIndex();
-                            i = index.getrIndex();
-                            if (result) {
-                                continue rlabel;
+                            WordConstruct wordConstruct =
+                                    new WordConstruct(xwpfDocument, table, row, cell, paragraph, run);
+                            if (Processor.processLabel(label, wordConstruct, index)) {
+                                t = index.getTableIndex();
+                                r = index.getRowIndex();
+                                c = index.getcIndex();
+                                p = index.getpIndex();
+                                i = index.getrIndex();
                             }
                         }
                     }
                 }
             }
         }
-    }
-
-    /**
-     * 2019/8/24 14:48
-     * Convert staticLabelite to staticLabel
-     *
-     * @param staticLabelite a simplified version of staticLabel
-     * @return staticLabel
-     * @author 657518680@qq.com
-     * @since 1.0.0
-     */
-    public static Map<String, Customization4Text> staticLite2Full(Map<String, String> staticLabelite) {
-        Map<String, Customization4Text> staticLabel = new HashMap<>(staticLabelite.size());
-        for (Map.Entry<String, String> entry : staticLabelite.entrySet()) {
-            staticLabel.put(entry.getKey(), new DefaultCustomization(entry.getValue()));
-        }
-        return staticLabel;
-    }
-
-    /**
-     * 2019/8/24 14:48
-     * Convert dynamicLabelite to dynamicLabel
-     *
-     * @param dynamicLabelite a simplified version of dynamicLabel
-     * @return dynamicLabel
-     * @author 657518680@qq.com
-     * @since 1.0.0
-     */
-    public static Map<String, List<Customization4Text>> dynamicLite2Full(Map<String, List<String>> dynamicLabelite) {
-        Map<String, List<Customization4Text>> dynamicLabel = new HashMap<>(dynamicLabelite.size());
-        for (Map.Entry<String, List<String>> entry : dynamicLabelite.entrySet()) {
-            List<Customization4Text> temp = new ArrayList<>(entry.getValue().size());
-            entry.getValue().forEach(str -> temp.add(new DefaultCustomization(str)));
-            dynamicLabel.put(entry.getKey(), temp);
-        }
-        return dynamicLabel;
-    }
-
-    /**
-     * 2019/8/24 14:48
-     * Convert tableLabelite to tableLabel
-     *
-     * @param tableLabelite a simplified version of tableLabel
-     * @return tableLabel
-     * @author 657518680@qq.com
-     * @since 1.0.0
-     */
-    public static Map<String, List<List<Customization4Text>>>
-    tableLite2Full(Map<String, List<List<String>>> tableLabelite) {
-        Map<String, List<List<Customization4Text>>> tableLabel = new HashMap<>(tableLabelite.size());
-        for (Map.Entry<String, List<List<String>>> entry : tableLabelite.entrySet()) {
-            List<List<Customization4Text>> rows = new ArrayList<>(entry.getValue().size());
-            entry.getValue().forEach((List<String> list) -> {
-                List<Customization4Text> row = new ArrayList<>(list.size());
-                list.forEach(str -> row.add(new DefaultCustomization(str)));
-                rows.add(row);
-            });
-            tableLabel.put(entry.getKey(), rows);
-        }
-        return tableLabel;
     }
 
 }

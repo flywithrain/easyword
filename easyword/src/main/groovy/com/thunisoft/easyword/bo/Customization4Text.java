@@ -8,6 +8,7 @@ package com.thunisoft.easyword.bo;
  * @version beta
  * @since alpha
  */
+@Deprecated
 public interface Customization4Text extends Customization {
 
     /**

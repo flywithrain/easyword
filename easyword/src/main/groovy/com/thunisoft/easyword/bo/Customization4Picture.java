@@ -7,7 +7,9 @@ import java.io.InputStream;
  *
  * @author wangxiaoyu 657518680@qq.com
  * @since 1.2.5
+ * @deprecated since 2.0.0
  */
+@Deprecated
 public interface Customization4Picture extends Customization {
 
     /**
@@ -33,7 +35,7 @@ public interface Customization4Picture extends Customization {
     /**
      * 2019/8/19
      * get the width in pixel of the picture inputStream in EasyWord
-     * if <=0 will use the native size of the image both height {@link Customization4Text#getHeight()}
+     * if <=0 will use the native size of the image both height {@link Customization4Picture#getHeight()}
      *
      * @return the width of the picture
      * @author 657518680@qq.com
@@ -44,7 +46,7 @@ public interface Customization4Picture extends Customization {
     /**
      * 2019/8/19
      * get the height in pixel of the picture inputStream in EasyWord
-     * if <=0 will use the native size of the image both width {@link Customization4Text#getWidth()}
+     * if <=0 will use the native size of the image both width {@link Customization4Picture#getWidth()}
      *
      * @return the height of the picture
      * @author 657518680@qq.com
