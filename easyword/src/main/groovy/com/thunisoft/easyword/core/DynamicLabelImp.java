@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  * 2019/12/3 19:59
  *
  * @author wangxiaoyu 657518680@qq.com
+ * @version 2.0.0
  * @since 2.0.0
  */
 public class DynamicLabelImp implements Customization {
@@ -35,21 +36,22 @@ public class DynamicLabelImp implements Customization {
     }
 
     public void setList(List<String> list) {
-        if(list == null){
+        if (list == null) {
             this.list = new ArrayList<>(0);
-        }else{
+        } else {
             this.list = list;
         }
     }
 
     /**
-     * 2019/8/19
-     * By implementing this method you can do almost anything with word
+     * 2019/12/6
+     * dynamic label back fill
      *
      * @param wordConstruct the struct of word in POI in paragraph only paragraph and run available
      * @param index         the index of attributes in wordConstruct
+     * @param key           the label
      * @author 657518680@qq.com
-     * @since alpha
+     * @since 2.0.0
      */
     @Override
     public void handle(String key, WordConstruct wordConstruct, Index index) {
@@ -70,13 +72,13 @@ public class DynamicLabelImp implements Customization {
     }
 
     /**
-     * 2019/8/24 14:48
+     * 2019/12/6 14:48
      * Convert dynamicLabelite to dynamicLabel
      *
      * @param dynamicLabelite a simplified version of dynamicLabel
      * @return dynamicLabel
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since 2.0.0
      */
     public static Map<String, Customization> lite2Full(Map<String, List<String>> dynamicLabelite) {
         return dynamicLabelite.entrySet().stream()

@@ -9,6 +9,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTableRow
 
 /**
  * @author 65751* @date 2019-08-2019/8/18 18:10
+ * @version 2.0.0
  */
 public class WordConstruct {
 

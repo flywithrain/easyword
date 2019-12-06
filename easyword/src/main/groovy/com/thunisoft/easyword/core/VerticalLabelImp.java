@@ -70,13 +70,14 @@ public class VerticalLabelImp implements Customization {
     }
 
     /**
-     * 2019/8/19
-     * By implementing this method you can do almost anything with word
+     * 2019/12/6
+     * vertical label back fill
      *
      * @param wordConstruct the struct of word in POI in paragraph only paragraph and run available
      * @param index         the index of attributes in wordConstruct
+     * @param key           the label
      * @author 657518680@qq.com
-     * @since alpha
+     * @since 2.0.0
      */
     @Override
     public void handle(String key, WordConstruct wordConstruct, Index index) {
@@ -143,6 +144,17 @@ public class VerticalLabelImp implements Customization {
         index.setpIndex(1);
     }
 
+    /**
+     * 2019/12/6
+     * determine if the row is the next row that can be used for table label rather than create a new row
+     *
+     * @param table    {@link Processor#isTheNextRow(XWPFTable, int, String, int)}
+     * @param rowIndex {@link Processor#isTheNextRow(XWPFTable, int, String, int)}
+     * @param style    {@link Processor#isTheNextRow(XWPFTable, int, String, int)}
+     * @param j        {@link Processor#isTheNextRow(XWPFTable, int, String, int)}
+     * @author wangxiaoyu 657518680@qq.com
+     * @since 2.0.0
+     */
     public boolean isTheNextRow(XWPFTable table, int rowIndex, String style, int j) {
         if (rowSum > 0) {
             return rowSum > j;
@@ -150,6 +162,14 @@ public class VerticalLabelImp implements Customization {
         return Processor.isTheNextRow(table, rowIndex, style, j);
     }
 
+    /**
+     * 2019/12/6 17:23
+     * Convert verticalLabelite to verticalLabel
+     *
+     * @param verticalLabelite a simplified version of verticalLabel
+     * @author wangxiaoyu 657518680@qq.com
+     * @since 2.0.0
+     */
     public static Map<String, Customization> lite2Full(Map<String, List<String>> verticalLabelite) {
         return verticalLabelite.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> new VerticalLabelImp(entry.getValue())));

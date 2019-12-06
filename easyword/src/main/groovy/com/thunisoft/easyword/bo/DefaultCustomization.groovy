@@ -5,6 +5,7 @@ package com.thunisoft.easyword.bo
  *
  * @author 657518680@qq.com
  * @since alpha
+ * @deprecated since 2.0.0
  */
 @Deprecated
 public class DefaultCustomization implements Customization4Text, Customization4Picture {

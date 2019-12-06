@@ -22,7 +22,7 @@ import java.util.Map;
  * EasyWord
  *
  * @author 657518680@qq.com
- * @version beta
+ * @version 2.0.0
  * @since alpha
  */
 public final class EasyWord {

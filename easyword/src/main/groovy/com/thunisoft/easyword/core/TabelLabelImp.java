@@ -27,6 +27,7 @@ import static com.thunisoft.easyword.core.Processor.*;
  *
  * @author wangxiaoyu 657518680@qq.com
  * @since 2.0.0
+ * @version 2.0.0
  */
 public class TabelLabelImp implements Customization {
 
@@ -69,13 +70,14 @@ public class TabelLabelImp implements Customization {
     }
 
     /**
-     * 2019/8/19
-     * By implementing this method you can do almost anything with word
+     * 2019/12/6
+     * table label back fill
      *
      * @param wordConstruct the struct of word in POI in paragraph only paragraph and run available
      * @param index         the index of attributes in wordConstruct
+     * @param key           the label
      * @author 657518680@qq.com
-     * @since alpha
+     * @since 2.0.0
      */
     @Override
     public void handle(String key, WordConstruct wordConstruct, Index index) {
@@ -152,6 +154,17 @@ public class TabelLabelImp implements Customization {
         index.setRowIndex(rowIndex);
     }
 
+    /**
+     * 2019/12/6 16:59
+     * determine if the row is the next row that can be used for table label rather than create a new row
+     *
+     * @param table    {@link Processor#isTheNextRow(XWPFTable, int, String, int)}
+     * @param rowIndex {@link Processor#isTheNextRow(XWPFTable, int, String, int)}
+     * @param style    {@link Processor#isTheNextRow(XWPFTable, int, String, int)}
+     * @param j        {@link Processor#isTheNextRow(XWPFTable, int, String, int)}
+     * @author wangxiaoyu 657518680@qq.com
+     * @since 2.0.0
+     */
     public boolean isTheNextRow(XWPFTable table, int rowIndex, String style, int j) {
         if (rowSum > 0) {
             return rowSum > j;
@@ -160,13 +173,13 @@ public class TabelLabelImp implements Customization {
     }
 
     /**
-     * 2019/8/24 14:48
+     * 2019/12/6 14:48
      * Convert tableLabelite to tableLabel
      *
      * @param tableLabelite a simplified version of tableLabel
      * @return tableLabel
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since 2.0.0
      */
     public static Map<String, Customization> lite2Full(Map<String, List<List<String>>> tableLabelite) {
         return tableLabelite.entrySet().stream()

@@ -7,6 +7,7 @@ package com.thunisoft.easyword.bo;
  * @author 657518680@qq.com
  * @version beta
  * @since alpha
+ * @deprecated since 2.0.0
  */
 @Deprecated
 public interface Customization4Text extends Customization {

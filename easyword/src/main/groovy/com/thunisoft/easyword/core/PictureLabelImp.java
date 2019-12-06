@@ -7,7 +7,6 @@ import com.thunisoft.easyword.util.AnalyzeFileType;
 import com.thunisoft.easyword.util.AnalyzeImageSize;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Units;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
 
@@ -25,6 +24,7 @@ import static com.thunisoft.easyword.core.Processor.processVanish;
  *
  * @author wangxiaoyu 657518680@qq.com
  * @since 2.0.0
+ * @version 2.0.0
  */
 public class PictureLabelImp implements Customization {
 
@@ -71,13 +71,14 @@ public class PictureLabelImp implements Customization {
     }
 
     /**
-     * 2019/8/19
-     * By implementing this method you can do almost anything with word
+     * 2019/12/6
+     * picture label back fill
      *
      * @param wordConstruct the struct of word in POI in paragraph only paragraph and run available
      * @param index         the index of attributes in wordConstruct
+     * @param key           the label
      * @author 657518680@qq.com
-     * @since alpha
+     * @since 2.0.0
      */
     @Override
     public void handle(String key, WordConstruct wordConstruct, Index index) {

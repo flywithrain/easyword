@@ -17,6 +17,7 @@ import static com.thunisoft.easyword.core.Processor.processVanish;
  *
  * @author wangxiaoyu 657518680@qq.com
  * @since 2.0.0
+ * @version 2.0.0
  */
 public class StaticLabelImp implements Customization {
 
@@ -26,36 +27,14 @@ public class StaticLabelImp implements Customization {
         setText("");
     }
 
-    /**
-     * 2019/12/3 17:04
-     *
-     * @param text A String
-     * @author wangxiaoyu 657518680@qq.com
-     * @since 2.0.0
-     */
     public StaticLabelImp(String text) {
         setText(text);
     }
 
-    /**
-     * 2019/8/19
-     * get the text of the label
-     *
-     * @return the text of the label
-     * @author 657518680@qq.com
-     * @since 2.0.0
-     */
     public String getText() {
         return text;
     }
 
-    /**
-     * 2019/12/3 17:02
-     *
-     * @param text A String
-     * @author wangxiaoyu 657518680@qq.com
-     * @since 2.0.0
-     */
     public void setText(String text) {
         if (text == null) {
             this.text = "";
@@ -65,11 +44,12 @@ public class StaticLabelImp implements Customization {
     }
 
     /**
-     * 2019/8/19
-     * By implementing this method you can do almost anything with word
+     * 2019/12/6
+     * static label back fill
      *
      * @param wordConstruct the struct of word in POI in paragraph only paragraph and run available
      * @param index         the index of attributes in wordConstruct
+     * @param key           the label
      * @author 657518680@qq.com
      * @since 2.0.0
      */
@@ -83,13 +63,13 @@ public class StaticLabelImp implements Customization {
     }
 
     /**
-     * 2019/8/24 14:48
+     * 2019/12/6 14:48
      * Convert staticLabelite to staticLabel
      *
      * @param staticLabelite a simplified version of staticLabel
      * @return staticLabel
      * @author 657518680@qq.com
-     * @since 1.0.0
+     * @since 2.0.0
      */
     public static Map<String, Customization> lite2Full(Map<String, String> staticLabelite) {
         return staticLabelite.entrySet().stream()

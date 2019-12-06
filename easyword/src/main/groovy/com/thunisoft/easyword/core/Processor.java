@@ -5,7 +5,6 @@ import com.thunisoft.easyword.bo.Index;
 import com.thunisoft.easyword.bo.WordConstruct;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xwpf.usermodel.*;
-import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlOptions;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
@@ -42,7 +41,7 @@ final class Processor {
      * 2019/8/19
      * process the label for both paragraph and table in word
      *
-     * @param label   label
+     * @param label         label
      * @param wordConstruct wordConstruct {@link WordConstruct}
      * @param index         index{@link Index}
      * @return true: already processed; false: not processed
@@ -64,34 +63,6 @@ final class Processor {
             }
         }
         return false;
-    }
-
-    private static void handleRunInParagraph(WordConstruct wordConstruct, Index index, TextSegment textSegment) {
-        XWPFParagraph paragraph = wordConstruct.getParagraph();
-        List<XWPFRun> runs = paragraph.getRuns();
-        int beginRun = textSegment.getBeginRun();
-        int endRun = textSegment.getEndRun();
-        StringBuilder b = new StringBuilder();
-        XWPFRun tempRun;
-        for (int runPos = beginRun; runPos <= endRun; runPos++) {
-            tempRun = runs.get(runPos);
-            b.append(tempRun.text());
-            clearRun(tempRun);
-        }
-        XWPFRun run = runs.get(beginRun);
-        run.setText(b.toString());
-        wordConstruct.setRun(run);
-        index.setrIndex(beginRun);
-    }
-
-    static XWPFRun clearRun(XWPFRun run){
-        XWPFParagraph paragraph = (XWPFParagraph) run.getParent();
-        int runIndex = paragraph.getRuns().indexOf(run);
-        CTRPr ctrPr = run.getCTR().getRPr();
-        XWPFRun newRun = paragraph.insertNewRun(runIndex);
-        newRun.getCTR().setRPr(ctrPr);
-        paragraph.removeRun(runIndex + 1);
-        return newRun;
     }
 
     /**
@@ -187,6 +158,24 @@ final class Processor {
     }
 
     /**
+     * 2019/12/6 16:43
+     * clear all in the run
+     *
+     * @param run the run need to clean
+     * @author wangxiaoyu 657518680@qq.com
+     * @since 2.0.0
+     */
+    static XWPFRun clearRun(XWPFRun run) {
+        XWPFParagraph paragraph = (XWPFParagraph) run.getParent();
+        int runIndex = paragraph.getRuns().indexOf(run);
+        CTRPr ctrPr = run.getCTR().getRPr();
+        XWPFRun newRun = paragraph.insertNewRun(runIndex);
+        newRun.getCTR().setRPr(ctrPr);
+        paragraph.removeRun(runIndex + 1);
+        return newRun;
+    }
+
+    /**
      * 2019/9/30 18:13
      * clear all in the cell
      *
@@ -196,7 +185,7 @@ final class Processor {
      */
     static void clearCell(XWPFTableCell tableCell) {
         for (int i = tableCell.getParagraphs().size() - 1; ; i--) {
-            if(i < 0){
+            if (i < 0) {
                 return;
             }
             tableCell.removeParagraph(i);
@@ -255,6 +244,35 @@ final class Processor {
         T cloneObj = (T) ois.readObject();
         ois.close();
         return cloneObj;
+    }
+
+    /**
+     * 2019/12/6 16:37
+     * XWPFRun : []
+     * [k][e][y] -> [key][][]
+     *
+     * @param wordConstruct wordConstruct
+     * @param index         index
+     * @param textSegment   the range of the run which text match the key
+     * @author wangxiaoyu 657518680@qq.com
+     * @since 2.0.0
+     */
+    private static void handleRunInParagraph(WordConstruct wordConstruct, Index index, TextSegment textSegment) {
+        XWPFParagraph paragraph = wordConstruct.getParagraph();
+        List<XWPFRun> runs = paragraph.getRuns();
+        int beginRun = textSegment.getBeginRun();
+        int endRun = textSegment.getEndRun();
+        StringBuilder b = new StringBuilder();
+        XWPFRun tempRun;
+        for (int runPos = beginRun; runPos <= endRun; runPos++) {
+            tempRun = runs.get(runPos);
+            b.append(tempRun.text());
+            clearRun(tempRun);
+        }
+        XWPFRun run = runs.get(beginRun);
+        run.setText(b.toString());
+        wordConstruct.setRun(run);
+        index.setrIndex(beginRun);
     }
 
 }

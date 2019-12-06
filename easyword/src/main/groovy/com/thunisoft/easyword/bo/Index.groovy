@@ -1,6 +1,7 @@
 package com.thunisoft.easyword.bo
 /**
  * @author 65751* @date 2019-08-2019/8/18 16:51
+ * @version 2.0.0
  */
 public class Index {
 
