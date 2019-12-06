@@ -20,5 +20,7 @@ public class Index {
     int rowIndex
     int cIndex
     int pIndex
+    @Deprecated
     int rIndex
+
 }

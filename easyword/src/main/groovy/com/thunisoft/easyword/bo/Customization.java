@@ -17,7 +17,7 @@ public interface Customization {
      * @author 657518680@qq.com
      * @since alpha
      */
-    default void handle(WordConstruct wordConstruct, Index index) {
+    default void handle(String key, WordConstruct wordConstruct, Index index) {
         // do nothing if need can override
     }
 

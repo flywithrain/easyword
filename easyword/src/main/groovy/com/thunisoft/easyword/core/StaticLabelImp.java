@@ -3,13 +3,13 @@ package com.thunisoft.easyword.core;
 import com.thunisoft.easyword.bo.Customization;
 import com.thunisoft.easyword.bo.Index;
 import com.thunisoft.easyword.bo.WordConstruct;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.thunisoft.easyword.core.Processor.clearRun;
 import static com.thunisoft.easyword.core.Processor.processVanish;
 
 /**
@@ -74,16 +74,12 @@ public class StaticLabelImp implements Customization {
      * @since 2.0.0
      */
     @Override
-    public void handle(WordConstruct wordConstruct, Index index) {
-        XWPFParagraph paragraph = wordConstruct.getParagraph();
+    public void handle(String key, WordConstruct wordConstruct, Index index) {
         XWPFRun run = wordConstruct.getRun();
-        int rIndex = index.getrIndex();
-        XWPFRun newRun = paragraph.insertNewRun(rIndex);
         CTRPr ctrPr = run.getCTR().getRPr();
         processVanish(ctrPr);
-        newRun.getCTR().setRPr(ctrPr);
-        paragraph.removeRun(rIndex + 1);
-        newRun.setText(text);
+        String str = run.text().replace(key, text);
+        clearRun(run).setText(str);
     }
 
     /**

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.thunisoft.easyword.core.Processor.clearRun;
 import static com.thunisoft.easyword.core.Processor.processVanish;
 
 /**
@@ -79,26 +80,21 @@ public class PictureLabelImp implements Customization {
      * @since alpha
      */
     @Override
-    public void handle(WordConstruct wordConstruct, Index index) {
-        XWPFParagraph paragraph = wordConstruct.getParagraph();
+    public void handle(String key, WordConstruct wordConstruct, Index index) {
         XWPFRun run = wordConstruct.getRun();
-        int rIndex = index.getrIndex();
-        XWPFRun newRun = paragraph.insertNewRun(rIndex);
         CTRPr ctrPr = run.getCTR().getRPr();
         processVanish(ctrPr);
-        newRun.getCTR().setRPr(ctrPr);
-        paragraph.removeRun(rIndex + 1);
-        processPicture(newRun);
+        processPicture(clearRun(run));
     }
 
     /**
      * 2019/8/20 14:15
      *
-     * @param newRun the run created to save image
+     * @param run the run created to save image
      * @author 657518680@qq.com
      * @since beta
      */
-    private void processPicture(XWPFRun newRun) {
+    private void processPicture(XWPFRun run) {
         try {
             byte[] bytes = IOUtils.toByteArray(picture);
             if (width <= 0 || height <= 0) {
@@ -106,7 +102,7 @@ public class PictureLabelImp implements Customization {
                 width = size.get("width");
                 height = size.get("height");
             }
-            newRun.addPicture(new ByteArrayInputStream(bytes),
+            run.addPicture(new ByteArrayInputStream(bytes),
                     AnalyzeFileType.getFileType(bytes),
                     pictureName,
                     Units.pixelToEMU(width),

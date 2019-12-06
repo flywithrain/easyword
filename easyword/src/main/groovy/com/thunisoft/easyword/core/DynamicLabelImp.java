@@ -52,12 +52,11 @@ public class DynamicLabelImp implements Customization {
      * @since alpha
      */
     @Override
-    public void handle(WordConstruct wordConstruct, Index index) {
+    public void handle(String key, WordConstruct wordConstruct, Index index) {
         XWPFDocument document = wordConstruct.getDocument();
         XWPFParagraph paragraph = wordConstruct.getParagraph();
         XWPFRun run = wordConstruct.getRun();
         int pIndex = index.getpIndex();
-        int rIndexMax = paragraph.getRuns().size();
         for (String str : list) {
             XmlCursor cursor = paragraph.getCTP().newCursor();
             XWPFParagraph newPara = document.insertNewParagraph(cursor);
@@ -67,7 +66,6 @@ public class DynamicLabelImp implements Customization {
             newRun.setText(str);
         }
         document.removeBodyElement(document.getPosOfParagraph(paragraph));
-        index.setrIndex(rIndexMax);
         index.setpIndex(pIndex + list.size() - 1);
     }
 

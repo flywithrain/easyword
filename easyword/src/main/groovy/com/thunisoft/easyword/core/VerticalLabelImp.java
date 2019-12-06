@@ -79,7 +79,7 @@ public class VerticalLabelImp implements Customization {
      * @since alpha
      */
     @Override
-    public void handle(WordConstruct wordConstruct, Index index) {
+    public void handle(String key, WordConstruct wordConstruct, Index index) {
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
@@ -91,7 +91,6 @@ public class VerticalLabelImp implements Customization {
 
         int rowIndex = index.getRowIndex();
         int cellIndex = index.getcIndex();
-        int rIndexMax = paragraph.getRuns().size();
 
         CTTrPr ctTrPr = row.getCtRow().getTrPr();
         String style = getTrPrString(ctTrPr);
@@ -141,7 +140,6 @@ public class VerticalLabelImp implements Customization {
             }
             rowIndex++;
         }
-        index.setrIndex(rIndexMax);
         index.setpIndex(1);
     }
 

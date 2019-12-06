@@ -124,15 +124,10 @@ public final class EasyWord {
         List<XWPFParagraph> paragraphs = xwpfDocument.getParagraphs();
         for (int p = 0; p < paragraphs.size(); ++p) {
             XWPFParagraph paragraph = paragraphs.get(p);
-            List<XWPFRun> runs = paragraph.getRuns();
-            for (int r = 0; r < runs.size(); ++r) {
-                XWPFRun run = runs.get(r);
-                Index index = new Index(p, r);
-                WordConstruct wordConstruct = new WordConstruct(xwpfDocument, paragraph, run);
-                if (Processor.processLabel(label, wordConstruct, index)) {
-                    p = index.getpIndex();
-                    r = index.getrIndex();
-                }
+            Index index = new Index(p, 0);
+            WordConstruct wordConstruct = new WordConstruct(xwpfDocument, paragraph, null);
+            if (Processor.processLabel(label, wordConstruct, index)) {
+                p = index.getpIndex();
             }
         }
     }
@@ -159,19 +154,14 @@ public final class EasyWord {
                     List<XWPFParagraph> paragraphs = cell.getParagraphs();
                     for (int p = 0; p < paragraphs.size(); ++p) {
                         XWPFParagraph paragraph = paragraphs.get(p);
-                        List<XWPFRun> runs = paragraph.getRuns();
-                        for (int i = 0; i < runs.size(); ++i) {
-                            XWPFRun run = runs.get(i);
-                            Index index = new Index(t, r, c, p, i);
-                            WordConstruct wordConstruct =
-                                    new WordConstruct(xwpfDocument, table, row, cell, paragraph, run);
-                            if (Processor.processLabel(label, wordConstruct, index)) {
-                                t = index.getTableIndex();
-                                r = index.getRowIndex();
-                                c = index.getcIndex();
-                                p = index.getpIndex();
-                                i = index.getrIndex();
-                            }
+                        Index index = new Index(t, r, c, p, 0);
+                        WordConstruct wordConstruct =
+                                new WordConstruct(xwpfDocument, table, row, cell, paragraph, null);
+                        if (Processor.processLabel(label, wordConstruct, index)) {
+                            t = index.getTableIndex();
+                            r = index.getRowIndex();
+                            c = index.getcIndex();
+                            p = index.getpIndex();
                         }
                     }
                 }
