@@ -75,6 +75,7 @@ publishing{
                     it.artifactId.text() == 'groovy-all'
                 }.each {
                     it.appendNode('type', 'pom')
+                    it.getByName('scope')[0].setValue("compile")
                 }
             }
         }

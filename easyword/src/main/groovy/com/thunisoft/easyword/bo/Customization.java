@@ -7,6 +7,7 @@ package com.thunisoft.easyword.bo;
  * @version 2.0.0
  * @since 1.1.3
  */
+@FunctionalInterface
 public interface Customization {
 
     /**
@@ -19,8 +20,6 @@ public interface Customization {
      * @author 657518680@qq.com
      * @since alpha
      */
-    default void handle(String key, WordConstruct wordConstruct, Index index) {
-        // do nothing if need can override
-    }
+    void handle(String key, WordConstruct wordConstruct, Index index);
 
 }

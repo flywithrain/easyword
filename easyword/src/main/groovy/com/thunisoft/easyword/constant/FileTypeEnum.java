@@ -134,7 +134,7 @@ public enum FileTypeEnum {
     /**
      * ZIP Archive.
      */
-    ZIP("504B0304"),
+    ZIP("504B0304", "00000000"),
 
     /**
      * RAR Archive.
@@ -181,20 +181,36 @@ public enum FileTypeEnum {
      */
     MID("4D546864");
 
-    private String hex;
-    private int value;
+    private final String headHex;
 
-    FileTypeEnum(String hex) {
-        this(hex, -1);
+    private final String endHex;
+
+    private final int value;
+
+    FileTypeEnum(String headHex) {
+        this(headHex, null, -1);
     }
 
-    FileTypeEnum(String hex, int value) {
-        this.hex = hex;
+    FileTypeEnum(String headHex, int value) {
+        this(headHex, null, value);
+    }
+
+    FileTypeEnum(String headHex, String endHex) {
+        this(headHex, endHex, -1);
+    }
+
+    FileTypeEnum(String headHex, String endHex, int value) {
+        this.headHex = headHex;
+        this.endHex = endHex;
         this.value = value;
     }
 
-    public String getHex() {
-        return hex;
+    public String getHeadHex() {
+        return headHex;
+    }
+
+    public String getEndHex() {
+        return endHex;
     }
 
     public int getValue() {

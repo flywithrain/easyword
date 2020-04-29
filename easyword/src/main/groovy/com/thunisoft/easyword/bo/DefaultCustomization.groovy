@@ -68,4 +68,9 @@ public class DefaultCustomization implements Customization4Text, Customization4P
         return height
     }
 
+    @Override
+    void handle(String key, WordConstruct wordConstruct, Index index) {
+
+    }
+
 }

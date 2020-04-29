@@ -41,7 +41,7 @@ public final class AnalyzeFileType {
         }
         String hex = builder.toString().toUpperCase(Locale.ENGLISH);
         for (FileTypeEnum typeEnum : FileTypeEnum.values()) {
-            if (hex.startsWith(typeEnum.getHex())) {
+            if (hex.startsWith(typeEnum.getHeadHex())) {
                 return typeEnum.getValue();
             }
         }
