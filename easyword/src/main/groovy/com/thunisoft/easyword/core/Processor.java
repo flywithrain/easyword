@@ -69,6 +69,7 @@ final class Processor {
     static boolean processLabel(Map<String, Customization> label,
                                 WordConstruct wordConstruct,
                                 Index index) {
+        boolean result = false;
         XWPFParagraph paragraph = wordConstruct.getParagraph();
         for (Map.Entry<String, Customization> entry : label.entrySet()) {
             String key = entry.getKey();
@@ -77,10 +78,10 @@ final class Processor {
                 handleRunInParagraph(wordConstruct, index, textSegment);
                 Customization customization = entry.getValue();
                 customization.handle(key, wordConstruct, index);
-                return true;
+                result = true;
             }
         }
-        return false;
+        return result;
     }
 
     /**

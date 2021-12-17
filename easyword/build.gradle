@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.thunisoft'
-version = '2.0.0'
+version = '2.0.1'
 sourceCompatibility = '1.8'
 def poiVersion = '4.1.1'
 
@@ -81,13 +81,14 @@ publishing{
         }
     }
     repositories{
-        maven{
-            credentials{
-                username 'dev'
-                password 'help'
-            }
-            url 'http://repo.thunisoft.com/maven2/content/repositories/releases/'
-        }
+        mavenLocal()
+//        maven{
+//            credentials{
+//                username 'dev'
+//                password 'help'
+//            }
+//            url 'http://repo.thunisoft.com/maven2/content/repositories/releases/'
+//        }
     }
 }
 
