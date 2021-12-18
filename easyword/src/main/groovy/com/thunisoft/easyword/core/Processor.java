@@ -1,37 +1,19 @@
 package com.thunisoft.easyword.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import com.thunisoft.easyword.bo.Customization;
+import com.thunisoft.easyword.bo.Index;
+import com.thunisoft.easyword.bo.WordConstruct;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.xwpf.usermodel.*;
+import org.apache.xmlbeans.XmlOptions;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.xwpf.usermodel.PositionInParagraph;
-import org.apache.poi.xwpf.usermodel.TextSegment;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFPictureData;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.apache.xmlbeans.XmlOptions;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTOnOff;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTrPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STOnOff;
-
-import com.thunisoft.easyword.bo.Customization;
-import com.thunisoft.easyword.bo.Index;
-import com.thunisoft.easyword.bo.WordConstruct;
 
 /**
  * 2019/8/13 19:07
@@ -73,7 +55,12 @@ final class Processor {
         XWPFParagraph paragraph = wordConstruct.getParagraph();
         for (Map.Entry<String, Customization> entry : label.entrySet()) {
             String key = entry.getKey();
-            TextSegment textSegment = paragraph.searchText(key, new PositionInParagraph());
+            TextSegment textSegment = null;
+            try {
+                textSegment = paragraph.searchText(key, new PositionInParagraph());
+            } catch (Exception e) {
+                return result;
+            }
             if (textSegment != null) {
                 handleRunInParagraph(wordConstruct, index, textSegment);
                 Customization customization = entry.getValue();
