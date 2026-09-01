@@ -1,3 +1,5 @@
+
+
 # **<center>EasyWord 2</center>**
 
 
@@ -35,7 +37,7 @@ replaceLabel(@NotNull InputStream inputStream,
 
 #### 3. 列表标签的替换
 
-​		现在由  TabelLabelImp.class实现
+​		现在由  TableLabelImp.class实现
 
 #### 4. 图片标签的替换
 
